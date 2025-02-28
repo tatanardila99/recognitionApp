@@ -12,10 +12,7 @@ class FaceIdIntroScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // Imagen de fondo
-          Image.asset(
-            'assets/background.jpg', 
-            fit: BoxFit.cover,
-          ),
+          Image.asset('assets/background.jpg', fit: BoxFit.cover),
           // Contenido principal
           Center(
             child: Column(
@@ -45,7 +42,7 @@ class FaceIdIntroScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const  Color(0xFF899DD9),
+                    backgroundColor: const Color(0xFF899DD9),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 80,
                       vertical: 14,
@@ -60,7 +57,10 @@ class FaceIdIntroScreen extends StatelessWidget {
                   child: Text(
                     "Get Started",
                     style: GoogleFonts.poppins(
-                        fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -71,4 +71,3 @@ class FaceIdIntroScreen extends StatelessWidget {
     );
   }
 }
-
