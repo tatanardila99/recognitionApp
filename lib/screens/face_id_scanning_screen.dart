@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/theme.dart'; 
 
 class FaceIdScanningScreen extends StatelessWidget {
+  const FaceIdScanningScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
