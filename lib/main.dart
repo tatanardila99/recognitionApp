@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
+import 'package:uts_recognitionapp/screens/student/dashboard.dart';
+import 'package:uts_recognitionapp/screens/student/profile.dart';
 import 'screens/face_id_intro_screen.dart';
 import 'screens/face_id_scanning_screen.dart';
 import 'screens/face_id_success_screen.dart';
@@ -23,6 +25,8 @@ class MyApp extends StatelessWidget {
         '/sign_up': (context) => FaceIdSignUp(),
         '/scan': (context) => FaceIdScanningScreen(),
         '/success': (context) => FaceIdSuccessScreen(),
+        '/student/dashboard': (context) => Dashboard(),
+        '/student/profile': (context) => ProfileScreen()
       },
     );
   }

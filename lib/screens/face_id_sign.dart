@@ -109,8 +109,7 @@ class _FaceIdSignState extends State<FaceIdSign> {
                   ),
                 ),
                 onPressed: () {
-                  // Puedes agregar alguna acción al presionar el botón si es necesario
-                  print('Botón Ingresar presionado');
+                  Navigator.pushNamed(context, '/student/dashboard');
                 },
                 child: Text('Ingresar', style: TextStyle(color: Colors.white)),
               ),
