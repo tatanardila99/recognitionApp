@@ -11,9 +11,9 @@ class FaceIdIntroScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Imagen de fondo
+
           Image.asset('assets/background.jpg', fit: BoxFit.cover),
-          // Contenido principal
+
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
