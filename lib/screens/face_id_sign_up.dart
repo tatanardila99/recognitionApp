@@ -1,23 +1,25 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:uts_recognitionapp/services/service.dart';
 
 class FaceIdSignUp extends StatelessWidget {
+  const FaceIdSignUp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Formulario());
+    return Scaffold(backgroundColor: Colors.white, body: MyForm());
   }
 }
 
-class Formulario extends StatefulWidget {
+class MyForm extends StatefulWidget {
+  const MyForm({super.key});
+
   @override
-  _FormularioState createState() => _FormularioState();
+  _MyFormState createState() => _MyFormState();
 }
 
-class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
+class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -51,7 +53,7 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
         });
       },
       onFaceDetected: (Face? face) {
-
+        // se deja como recordatorio para implementar logica adicional
       },
     );
   }
@@ -71,11 +73,20 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          width: 200,
+          height: 200,
+          child: Image.asset(
+            'assets/shape.png',
+            fit: BoxFit.contain,
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
@@ -97,7 +108,7 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey[350],
+                    fillColor: Color(0xFFF6F6F6),
                     labelText: 'Ingrese su nombre',
                   ),
                   validator: (value) {
@@ -116,7 +127,7 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey[350],
+                    fillColor: Color(0xFFF6F6F6),
                     labelText: 'Ingrese su correo institucional',
                   ),
                   validator: (value) {
@@ -134,7 +145,7 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey[350],
+                    fillColor: Color(0xFFF6F6F6),
                     labelText: 'Rol',
                   ),
                   value: _selectedRol,
@@ -165,7 +176,7 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey[350],
+                    fillColor: Color(0xFFF6F6F6),
                     labelText: 'Ingrese una contraseña',
                   ),
                   obscureText: true,
@@ -177,7 +188,6 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                   },
                 ),
                 SizedBox(height: 40),
-
                 GestureDetector(
                   onTap: _startCamera,
                   child: Container(
@@ -232,10 +242,16 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
                         name,
                         email,
                         password,
-                        "454545454",
+                        "6434222224", // de momento esta quemado
                         _selectedRol!,
                         _capturedFace,
                       );
+
+                      if (success) {
+                        print('Registro exitoso!');
+                      } else {
+                        print('Error al registrar');
+                      }
                     }
                   },
                   child: Text('Enviar', style: TextStyle(color: Colors.white)),
@@ -275,4 +291,3 @@ class _FormularioState extends State<Formulario> with WidgetsBindingObserver {
     );
   }
 }
-
