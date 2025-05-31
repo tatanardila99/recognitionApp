@@ -12,7 +12,7 @@ class _BottomBarNavigation extends State<BottomBarNavigation> {
   int _selectedIndex = 0;
 
   final List<String> screenOptions = [
-    "/student/dashboard",
+    "/student/home",
     "/student/profile",
   ];
 
@@ -33,7 +33,7 @@ class _BottomBarNavigation extends State<BottomBarNavigation> {
         BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Inicio'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
       ],
-      //type: BottomNavigationBarType.fixed,
+
       currentIndex: _selectedIndex,
       selectedItemColor: const Color(0xFF899DD9),
       onTap: _onTappedItem,

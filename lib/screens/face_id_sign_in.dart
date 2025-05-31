@@ -174,7 +174,23 @@ class _LoginPageState extends State<LoginPage> {
 
                       if (loginResult != null && loginResult['success'] == true) {
                         _showMessage("Inicio de sesión exitoso");
-                        Navigator.pushReplacementNamed(context, '/proffesor/home');
+
+                        final List<dynamic>? accessInfo = loginResult['access_info'];
+
+                        final Map<String, dynamic>? userData = loginResult['user_data'];
+
+                        if (loginResult['message'] == 1) {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/student/home',
+                            arguments: {
+                              'accessInfo': accessInfo,
+                              'userData': userData,
+                            },
+                          );
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/professor/home');
+                        }
                       } else {
                         _showMessage("Error al iniciar sesion, verifica tus credenciales.", isError: true);
                       }

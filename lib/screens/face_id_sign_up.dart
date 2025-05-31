@@ -53,7 +53,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
         });
       },
       onFaceDetected: (Face? face) {
-        // se deja como recordatorio para implementar logica adicional
+
       },
     );
   }
@@ -242,7 +242,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                         name,
                         email,
                         password,
-                        "6434222224", // de momento esta quemado
+                        "6434222225", // de momento esta quemado
                         _selectedRol!,
                         _capturedFace,
                       );

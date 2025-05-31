@@ -1,9 +1,88 @@
 import 'package:flutter/material.dart';
+import '../../models/location.dart';
+import '../../services/service.dart';
+import 'add_location_screen.dart';
+import 'face_rekognition_screen.dart';
+import 'location_card.dart';
 
 
+class HomeProfessor extends StatefulWidget {
+  const HomeProfessor({super.key});
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  @override
+  _HomeProfessor createState() => _HomeProfessor();
+}
+
+class _HomeProfessor extends State<HomeProfessor> {
+  int _selectedIndex = 0;
+  final BackendService _backendService = BackendService();
+  List<Location> _locations = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocations();
+  }
+
+
+  Future<void> _fetchLocations() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final fetchedLocations = await _backendService.getLocations();
+      setState(() {
+        _locations = fetchedLocations;
+      });
+    } catch (e) {
+      print('Error al cargar ubicaciones: $e');
+
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _startFaceCamera(BuildContext context, int locationId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FaceCameraScreen(locationId: locationId)),
+    );
+  }
+
+
+  void _addLocation(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddLocationScreen()),
+    );
+
+    if (result != null) {
+      _fetchLocations();
+    }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      if (index == 1) {
+        _addLocation(context);
+      } else {
+        print("Item seleccionado : $index");
+      }
+    });
+  }
+
+  void _onLocationCardTapped(Location location) {
+    print('Tarjeta clickeada: ${location.name} (ID: ${location.id})');
+    print('Iniciando cámara facial para ${location.name}...');
+
+
+    _startFaceCamera(context, location.id);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +93,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 30), // Espacio superior
+            const SizedBox(height: 30),
 
-            // Fila de Saludo y Notificación
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -39,7 +117,6 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Contenedor de la Tarjeta de Acceso
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -79,15 +156,16 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
+
                   Image.asset(
-                    'assets/security_image.jpg',
+                    'assets/shield.jpg',
                     height: 100,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 30),
-            // Texto de la Lista de Cursos
+
             const Text(
               'Lista de Cursos',
               style: TextStyle(
@@ -98,43 +176,45 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: <Widget>[
-                _buildCourseContainer(
-                  context,
-                  'Programación',
-                  const Color(0xFFE0E0E0),
-                  'assets/programing_imgage.png',
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _locations.isEmpty
+                ? const Center(
+              child: Text(
+                'No hay espacios registrados.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+                : Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 3.0,
                 ),
-                _buildCourseContainer(
-                  context,
-                  'Bases de Datos',
-                  const Color(0xFFE0E0E0),
-                  'assets/image_database.png',
-                ),
-                _buildCourseContainer(
-                  context,
-                  'Servidores',
-                  const Color(0xFFE0E0E0),
-                  'assets/server_image.png',
-                ),
-                _buildCourseContainer(
-                  context,
-                  'Inglés',
-                  const Color(0xFFE0E0E0),
-                  'assets/book_image.png', // Reemplazar
-                ),
-              ],
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: _locations.length,
+                itemBuilder: (context, index) {
+                  final location = _locations[index];
+
+                  return LocationDisplayCard(
+                    locationName: location.name,
+                    edificio: location.edificio,
+                    salon: location.salon,
+                    startTime: location.horaEntrada,
+                    endTime: location.horaSalida,
+                    locationData: location,
+                    onTap: _onLocationCardTapped,
+                  );
+                },
+              ),
             ),
           ],
         ),
       ),
-      // Barra de Navegación Inferior
+
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -142,7 +222,7 @@ class HomeScreen extends StatelessWidget {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.import_export_outlined, color: Colors.grey),
+            icon: Icon(Icons.add, color: Colors.grey),
             label: '',
           ),
           BottomNavigationBarItem(
@@ -150,46 +230,12 @@ class HomeScreen extends StatelessWidget {
             label: '',
           ),
         ],
-        currentIndex: 0, // El índice del elemento seleccionado
-        onTap: (int index) {
-          // TODO: Lógica para cambiar de página
-        },
-      ),
-    );
-  }
-
-  // Método para construir los Contenedores de los Cursos
-  Widget _buildCourseContainer(
-      BuildContext context,
-      String courseName,
-      Color containerColor,
-      String imagePath,
-      ) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: containerColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image.asset(
-            imagePath,
-            height: 50,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            courseName,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }
 }
+
 

@@ -32,7 +32,7 @@ class _ProfileScreen extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Nombre del usuario
+
             const Center(
               child: Text(
                 'User',
