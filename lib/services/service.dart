@@ -1,5 +1,6 @@
 // backend_service.dart
 import 'dart:convert';
+import 'dart:core';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -93,7 +94,7 @@ class BackendService {
     }
   }
 
-  Future<bool> validateAccess(File image, String locationId) async {
+  Future<Map<String, dynamic>?> validateAccess(File image, String locationId) async {
     final Uri uri = Uri.parse('$_baseUrl/validate-access');
 
     try {
@@ -108,18 +109,22 @@ class BackendService {
       var response = await request.send();
 
       if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final Map<String, dynamic> data = json.decode(responseBody);
         print('Image and location sent successfully. Access granted.');
-        return true;
+        String? userName = data['user'];
+        double? similarity = data['similarity'];
+        return {'username': userName, 'similarity': similarity };
       } else {
 
         final responseBody = await response.stream.bytesToString();
         print('Error sending image: ${response.statusCode}');
         print('Response body: $responseBody'); // Log the error detail
-        return false;
+        return null;
       }
     } catch (e) {
       print('Connection error: $e');
-      return false;
+      return null;
     }
   }
 
@@ -164,6 +169,27 @@ class BackendService {
     } catch (error) {
       print('Error de conexión al obtener ubicaciones: $error');
       return [];
+    }
+  }
+
+
+  Future<Map<String, dynamic>?> getLocationBYId(int id) async {
+    final Uri uri = Uri.parse('$_baseUrl/get-location-by-id/$id');
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+
+        Map<String, dynamic> location = responseBody['location'];
+        return {'location_name': location['name']};
+      } else {
+        print("error al obtener la ubicacion");
+        return null;
+      }
+    } catch (error) {
+      print("Error = $error");
+      return null;
     }
   }
 

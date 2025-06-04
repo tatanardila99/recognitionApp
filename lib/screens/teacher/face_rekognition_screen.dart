@@ -68,13 +68,14 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
     });
 
     try {
-      bool success = await _backendService.validateAccess(
+      Map<String, dynamic>? res = await _backendService.validateAccess(
         image,
         widget.locationId.toString(),
       );
 
-      if (success) {
-        showSuccessDialog(context: context, userName: "ivan", confidence: 99.0, locationName: "laboratorio", onOkPressed: () => {print("ok")});
+      if (res != null) {
+        Map<String, dynamic>? location = await _backendService.getLocationBYId(widget.locationId);
+        showSuccessDialog(context: context, userName: res['username'], confidence: res['similarity'], locationName: location?['location_name'], onOkPressed: () => {print("ok")});
       } else {
         showToastMessage(context: context, message: "El usuario no se encuentra registrado", isError: true);
       }

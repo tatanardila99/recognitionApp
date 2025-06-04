@@ -38,7 +38,7 @@ void showSuccessDialog({
               ),
               const SizedBox(height: 20),
               const Text(
-                'Success',
+                'Verificación exitosa',
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
@@ -47,17 +47,17 @@ void showSuccessDialog({
               ),
               const SizedBox(height: 10),
               Text(
-                'User: $userName',
+                'Usuario: $userName',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16.0, color: Colors.grey),
               ),
               Text(
-                'Confidence: ${confidence.toStringAsFixed(1)}%',
+                'Similitud: ${confidence.toStringAsFixed(1)}%',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16.0, color: Colors.grey),
               ),
               Text(
-                'Location: $locationName',
+                'Ubicación: $locationName',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16.0, color: Colors.grey),
               ),
