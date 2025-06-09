@@ -1,6 +1,11 @@
+// student_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/providers/user_provider.dart';
+import 'package:uts_recognitionapp/models/user_data.dart';
+import 'package:uts_recognitionapp/models/access_info.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -10,24 +15,28 @@ class StudentHomeScreen extends StatefulWidget {
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
-  List<dynamic>? _accessInfo;
-  Map<String, dynamic>? _userData;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+
     final Map<String, dynamic>? args =
     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (args != null) {
+    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-      setState(() {
-        _accessInfo = args['accessInfo'];
-        _userData = args['userData'];
-      });
-      print('Accesos recibidos: $_accessInfo');
-      print('Datos de usuario recibidos: $_userData');
+      List<dynamic>? accessInfoRaw = args['accessInfo'];
+      Map<String, dynamic>? userDataRaw = args['userData'];
+
+      if (userDataRaw != null) {
+        userProvider.setUser(userDataRaw);
+      }
+      if (accessInfoRaw != null) {
+        userProvider.setAccessInfo(accessInfoRaw);
+      }
+      print('Datos guardados en el Provider.');
     }
   }
 
@@ -35,7 +44,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   String _formatDate(String dateString) {
     try {
       final dateTime = DateTime.parse(dateString);
-
       return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
     } catch (e) {
       print('Error al formatear fecha: $e');
@@ -45,6 +53,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final UserData? currentUser = userProvider.currentUser;
+    final List<AccessEntry>? currentAccessInfo = userProvider.currentAccessInfo;
+
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,7 +86,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  _userData?['name'] ?? "Usuario", // Muestra el nombre del usuario
+                  currentUser?.name ?? "Usuario",
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 18,
@@ -96,11 +109,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
 
           Expanded(
-            child: _accessInfo == null || _accessInfo!.isEmpty
+            child: currentAccessInfo == null || currentAccessInfo.isEmpty
                 ? const Center(child: Text('No hay registros de acceso disponibles.'))
-                : SingleChildScrollView( // Permite hacer scroll si hay muchas filas
+                : SingleChildScrollView(
               scrollDirection: Axis.vertical,
-              child: SingleChildScrollView( // Permite hacer scroll horizontal si la tabla es ancha
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   columns: const <DataColumn>[
@@ -109,13 +122,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                     DataColumn(label: Text('Resultado')),
                     DataColumn(label: Text('Confianza')),
                   ],
-                  rows: _accessInfo!.map<DataRow>((access) {
+                  rows: currentAccessInfo.map<DataRow>((access) {
                     return DataRow(
                       cells: <DataCell>[
-                        DataCell(Text(access['location_name'] ?? '')),
-                        DataCell(Text(_formatDate(access['date_entry'] ?? ''))),
-                        DataCell(Text(access['result'] ?? '')),
-                        DataCell(Text('${double.tryParse(access['confidence'].toString())?.toStringAsFixed(2) ?? 'N/A'}%')),
+                        DataCell(Text(access.locationName ?? '')),
+                        DataCell(Text(_formatDate(access.dateEntry ?? ''))),
+                        DataCell(Text(access.result ?? '')),
+                        DataCell(Text('${access.confidence?.toStringAsFixed(2) ?? 'N/A'}%')),
                       ],
                     );
                   }).toList(),

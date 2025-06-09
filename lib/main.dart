@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
 import 'package:uts_recognitionapp/screens/student/home_student.dart';
-import 'package:uts_recognitionapp/screens/student/profile.dart';
-import 'package:uts_recognitionapp/screens/teacher/home_proffesor.dart';
+import 'package:uts_recognitionapp/screens/student/student_profile.dart';
+import 'package:uts_recognitionapp/screens/teacher/home_professor.dart';
 import 'screens/face_id_intro_screen.dart';
 import 'screens/face_id_scanning_screen.dart';
 import 'screens/face_id_success_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/providers/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +18,12 @@ void main() async {
   await FaceCamera.initialize();
   await initializeDateFormatting('es_ES', null);
 
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,14 +35,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => FaceIdIntroScreen(),
-        '/sign': (context) => LoginPage(),
-        '/sign_up': (context) => FaceIdSignUp(),
-        '/scan': (context) => FaceIdScanningScreen(),
-        '/success': (context) => FaceIdSuccessScreen(),
-        '/student/home': (context) => StudentHomeScreen(),
-        '/student/profile': (context) => ProfileScreen(),
-        '/professor/home': (context) => HomeProfessor(),
+        '/': (context) => const FaceIdIntroScreen(),
+        '/sign': (context) => const LoginPage(),
+        '/sign_up': (context) => const FaceIdSignUp(),
+        '/scan': (context) => const FaceIdScanningScreen(),
+        '/success': (context) => const FaceIdSuccessScreen(),
+        '/student/home': (context) => const StudentHomeScreen(),
+        '/student/profile': (context) => const ProfileScreen(),
+        '/professor/home': (context) => const HomeProfessor(),
       },
     );
   }

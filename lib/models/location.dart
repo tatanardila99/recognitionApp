@@ -1,11 +1,10 @@
-// lib/models/location.dart
 class Location {
   final int id;
   final String name;
   final String edificio;
   final int salon;
-  final String horaEntrada; // Formato HH:MM:SS
-  final String horaSalida;  // Formato HH:MM:SS
+  final String horaEntrada;
+  final String horaSalida;
 
   Location({
     required this.id,

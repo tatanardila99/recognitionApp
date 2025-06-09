@@ -38,9 +38,8 @@ class LocationDisplayCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Barra lateral de color
               Container(
-                width: 15.0, // Ancho de la barra
+                width: 15.0,
                 decoration: const BoxDecoration(
                   color: Color(0xFF2C3E50),
                   borderRadius: BorderRadius.only(

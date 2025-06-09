@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/theme.dart'; // Archivo donde definimos AppColors
+
 
 class FaceIdIntroScreen extends StatelessWidget {
   const FaceIdIntroScreen({super.key});

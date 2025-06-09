@@ -13,6 +13,21 @@ class BackendService {
   final String _baseUrl = 'http://192.168.1.8:3000/api';   // fisico
   final http.Client _httpClient = http.Client();
 
+  Future<Map<String, dynamic>> _put(String endpoint, Map<String, dynamic> data) async {
+    final response = await _httpClient.put(
+      Uri.parse('$_baseUrl/$endpoint'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      final errorBody = json.decode(response.body);
+      throw Exception('Failed to update data: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
+    }
+  }
+
   Future<bool> sendDataRegister(
       String name,
       String email,
@@ -190,6 +205,52 @@ class BackendService {
     } catch (error) {
       print("Error = $error");
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateUser(
+      int userId,
+      Map<String, dynamic> updateData,
+      ) async {
+    final Uri uri = Uri.parse('$_baseUrl/update-user/$userId');
+
+    try {
+      final response = await _httpClient.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(updateData),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final errorBody = json.decode(response.body);
+        throw Exception('Failed to update user: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> updatePassword(
+      int userId,
+      String currentPassword,
+      String newPassword,
+      ) async {
+
+    final String endpoint = 'update-user/$userId';
+
+
+    final Map<String, dynamic> data = {
+      'currentPassword': currentPassword,
+      'password_hash': newPassword,
+    };
+
+    try {
+      final response = await _put(endpoint, data);
+      return response;
+    } catch (e) {
+      rethrow;
     }
   }
 
