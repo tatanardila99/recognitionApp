@@ -32,7 +32,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   File? _capturedFace;
   FaceCameraController? _cameraController;
   bool _isCameraActive = false;
-  String _cameraMessage = 'Presiona el icono para iniciar la cámara';
+  String _cameraMessage = 'Tomar foto';
 
   @override
   void initState() {
@@ -47,14 +47,12 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
           _cameraMessage = 'Rostro capturado!';
           Future.delayed(const Duration(seconds: 3), () {
             setState(() {
-              _cameraMessage = 'Presiona el icono para iniciar la cámara';
+              _cameraMessage = 'Tomar foto';
             });
           });
         });
       },
-      onFaceDetected: (Face? face) {
-
-      },
+      onFaceDetected: (Face? face) {},
     );
   }
 
@@ -80,31 +78,34 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
         Positioned(
           top: 0,
           left: 0,
-          width: 200,
-          height: 200,
-          child: Image.asset(
-            'assets/shape.png',
-            fit: BoxFit.contain,
-          ),
+          width: 150,
+          height: 150,
+          child: Image.asset('assets/shape.png', fit: BoxFit.contain),
         ),
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(30.0),
           child: Form(
             key: _formKey,
             child: ListView(
               children: <Widget>[
-                SizedBox(height: 100),
+                SizedBox(height: 70),
                 Text(
-                  "Bienvenido",
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  "Bienvenido a bordo!",
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: 20),
+                Text(
+                  "Te ayudamos a gestionar un acceso seguro",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 30),
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(22.0),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
@@ -118,12 +119,12 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(22.0),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
@@ -137,11 +138,11 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 15),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(22.0),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
@@ -149,12 +150,13 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     labelText: 'Rol',
                   ),
                   value: _selectedRol,
-                  items: _roles.map((String rol) {
-                    return DropdownMenuItem<String>(
-                      value: rol,
-                      child: Text(rol),
-                    );
-                  }).toList(),
+                  items:
+                      _roles.map((String rol) {
+                        return DropdownMenuItem<String>(
+                          value: rol,
+                          child: Text(rol),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedRol = newValue;
@@ -167,12 +169,12 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(22.0),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
@@ -197,7 +199,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         image: AssetImage('assets/camera.png'),
-                        fit: BoxFit.contain,
+                        fit: BoxFit.fitHeight,
                       ),
                     ),
                   ),
@@ -220,20 +222,21 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       fit: BoxFit.cover,
                     ),
                   ),
-                SizedBox(height: 10),
+                SizedBox(height: 40),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF899DD9),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 80,
+                      horizontal: 10,
                       vertical: 14,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
                   onPressed: () async {
-                    if (_formKey.currentState!.validate() && _capturedFace != null) {
+                    if (_formKey.currentState!.validate() &&
+                        _capturedFace != null) {
                       final String name = _nameController.text;
                       final String email = _emailController.text;
                       final String password = _passwordController.text;
@@ -254,16 +257,19 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       }
                     }
                   },
-                  child: Text('Enviar', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Registrate',
+                    style: TextStyle(color: Colors.white, fontSize: 18.0),
+                  ),
                 ),
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Ya estas registrado?   '),
+                    Text('¿Ya tiene una cuenta?  '),
                     InkWell(
                       child: Text(
-                        'Ingresar',
+                        'Iniciar sesión',
                         style: TextStyle(color: Color(0xFF50C2C9)),
                       ),
                       onTap: () {

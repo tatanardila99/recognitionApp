@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class FaceIdIntroScreen extends StatelessWidget {
   const FaceIdIntroScreen({super.key});
 
@@ -11,7 +10,6 @@ class FaceIdIntroScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-
           Image.asset('assets/background.jpg', fit: BoxFit.cover),
 
           Center(
@@ -55,7 +53,7 @@ class FaceIdIntroScreen extends StatelessWidget {
                     Navigator.pushNamed(context, '/sign');
                   },
                   child: Text(
-                    "Get Started",
+                    "Comenzar",
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       color: Colors.white,

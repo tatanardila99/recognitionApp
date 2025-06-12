@@ -19,7 +19,10 @@ class _LoginPageState extends State<LoginPage> {
 
   void _showMessage(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: isError ? Colors.red : Colors.green)
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
     );
   }
 
@@ -34,10 +37,7 @@ class _LoginPageState extends State<LoginPage> {
             left: 0,
             width: 200,
             height: 200,
-            child: Image.asset(
-              'assets/shape.png',
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset('assets/shape.png', fit: BoxFit.contain),
           ),
           SingleChildScrollView(
             child: Padding(
@@ -62,10 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.asset(
-                          'assets/image_login.png',
-                          height: 100,
-                        ),
+                        Image.asset('assets/image_login.png', height: 100),
                         Positioned(
                           right: 40,
                           child: Column(
@@ -108,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      hintText: 'Ingrese el correo',
+                      hintText: 'Ingresa tu correo electronico',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
@@ -122,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      hintText: 'Ingrese la clave',
+                      hintText: 'Ingresa tu contraseña',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
@@ -131,7 +128,9 @@ class _LoginPageState extends State<LoginPage> {
                       fillColor: Colors.grey[200],
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                           color: Colors.grey,
                         ),
                         onPressed: () {
@@ -144,57 +143,68 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 10.0),
                   Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.topLeft,
                     child: TextButton(
-                      onPressed: () {
-
-                      },
+                      onPressed: () {},
                       child: const Text(
-                        'Olvido la clave',
-                        style: TextStyle(color: Color(0xFF50C2C9)),
+                        'Olvidaste tu contraseña?',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 147, 182, 184),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 25.0),
                   ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        :  () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      String email = _emailController.text;
-                      String password = _passwordController.text;
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : () async {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              String email = _emailController.text;
+                              String password = _passwordController.text;
 
-                      final loginResult = await _backendService.sendDataLogin(email, password);
+                              final loginResult = await _backendService
+                                  .sendDataLogin(email, password);
 
-                      setState(() {
-                        _isLoading = false;
-                      });
+                              setState(() {
+                                _isLoading = false;
+                              });
 
-                      if (loginResult != null && loginResult['success'] == true) {
-                        _showMessage("Inicio de sesión exitoso");
+                              if (loginResult != null &&
+                                  loginResult['success'] == true) {
+                                _showMessage("Inicio de sesión exitoso");
 
-                        final List<dynamic>? accessInfo = loginResult['access_info'];
+                                final List<dynamic>? accessInfo =
+                                    loginResult['access_info'];
 
-                        final Map<String, dynamic>? userData = loginResult['user_data'];
+                                final Map<String, dynamic>? userData =
+                                    loginResult['user_data'];
 
-                        if (loginResult['message'] == 1) {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/student/home',
-                            arguments: {
-                              'accessInfo': accessInfo,
-                              'userData': userData,
+                                if (loginResult['message'] == 1) {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/student/home',
+                                    arguments: {
+                                      'accessInfo': accessInfo,
+                                      'userData': userData,
+                                    },
+                                  );
+                                } else {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/professor/home',
+                                  );
+                                }
+                              } else {
+                                _showMessage(
+                                  "Error al iniciar sesion, verifica tus credenciales.",
+                                  isError: true,
+                                );
+                              }
                             },
-                          );
-                        } else {
-                          Navigator.pushReplacementNamed(context, '/professor/home');
-                        }
-                      } else {
-                        _showMessage("Error al iniciar sesion, verifica tus credenciales.", isError: true);
-                      }
-                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF899DD9),
                       padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -204,10 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: const Text(
                       'Ingresar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 18.0),
                     ),
                   ),
                   const SizedBox(height: 30.0),
@@ -215,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       const Text(
-                        "No tiene cuenta? ",
+                        "No tienes cuenta? ",
                         style: TextStyle(color: Colors.black54),
                       ),
                       TextButton(
@@ -223,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushNamed(context, '/sign_up');
                         },
                         child: const Text(
-                          'Registrarse',
+                          'Registrate',
                           style: TextStyle(
                             color: Color(0xFF50C2C9),
                             fontWeight: FontWeight.bold,
