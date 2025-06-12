@@ -119,7 +119,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 18),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -138,23 +138,54 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 18),
+
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(22.0),
-                      borderSide: BorderSide.none,
+                    labelText: 'Rol',
+                    labelStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                     filled: true,
-                    fillColor: Color(0xFFF6F6F6),
-                    labelText: 'Rol',
+                    fillColor: const  Color(0xFFF6F6F6),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        width: 1.5,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 1.5,
+                      ),
+                    ),
                   ),
+                  dropdownColor: Colors.white,
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: const Color.fromARGB(255, 98, 94, 104),
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                   value: _selectedRol,
                   items:
                       _roles.map((String rol) {
                         return DropdownMenuItem<String>(
                           value: rol,
-                          child: Text(rol),
+                          child: Text(
+                            rol[0].toUpperCase() + rol.substring(1),
+                            style: TextStyle(fontSize: 16),
+                          ),
                         );
                       }).toList(),
                   onChanged: (String? newValue) {
@@ -162,14 +193,14 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       _selectedRol = newValue;
                     });
                   },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor selecciona un rol';
-                    }
-                    return null;
-                  },
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? 'Por favor selecciona un rol'
+                              : null,
                 ),
-                SizedBox(height: 15),
+
+                SizedBox(height: 18),
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -189,14 +220,14 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     return null;
                   },
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 20),
                 GestureDetector(
                   onTap: _startCamera,
                   child: Container(
-                    width: 100,
-                    height: 100,
+                    width: 105,
+                    height: 105,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      shape: BoxShape.rectangle,
                       image: DecorationImage(
                         image: AssetImage('assets/camera.png'),
                         fit: BoxFit.fitHeight,
@@ -214,7 +245,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                 ),
                 if (_capturedFace != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
+                    padding: const EdgeInsets.only(top: 6.0),
                     child: Image.file(
                       _capturedFace!,
                       width: 150,
@@ -227,7 +258,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF899DD9),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
+                      horizontal: 20,
                       vertical: 14,
                     ),
                     shape: RoundedRectangleBorder(
