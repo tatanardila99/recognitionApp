@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
 import 'package:uts_recognitionapp/screens/student/home_student.dart';
-import 'package:uts_recognitionapp/screens/student/student_profile.dart';
+import 'package:uts_recognitionapp/screens/common/profile_screen.dart';
 import 'package:uts_recognitionapp/screens/teacher/home_professor.dart';
 import 'screens/face_id_intro_screen.dart';
 import 'screens/face_id_scanning_screen.dart';
@@ -41,7 +41,6 @@ class MyApp extends StatelessWidget {
         '/scan': (context) => const FaceIdScanningScreen(),
         '/success': (context) => const FaceIdSuccessScreen(),
         '/student/home': (context) => const StudentHomeScreen(),
-        '/student/profile': (context) => const ProfileScreen(),
         '/professor/home': (context) => const HomeProfessor(),
       },
     );

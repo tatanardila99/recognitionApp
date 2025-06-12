@@ -32,7 +32,6 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
 
 
   void _handleUpdateUser() async {
-    // Get user ID from the provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.currentUser?.id;
 

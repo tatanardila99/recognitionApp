@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/screens/common/profile_screen.dart';
+import 'package:uts_recognitionapp/screens/teacher/bottom_bar_navigation_professor.dart';
 import '../../models/location.dart';
+import '../../providers/user_provider.dart';
 import '../../services/service.dart';
 import 'add_location_screen.dart';
 import 'face_rekognition_screen.dart';
@@ -14,7 +18,7 @@ class HomeProfessor extends StatefulWidget {
 }
 
 class _HomeProfessor extends State<HomeProfessor> {
-  int _selectedIndex = 0;
+
   final BackendService _backendService = BackendService();
   List<Location> _locations = [];
   bool _isLoading = true;
@@ -23,6 +27,30 @@ class _HomeProfessor extends State<HomeProfessor> {
   void initState() {
     super.initState();
     _fetchLocations();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+
+    final Map<String, dynamic>? args =
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      List<dynamic>? accessInfoRaw = args['accessInfo'];
+      Map<String, dynamic>? userDataRaw = args['userData'];
+
+      if (userDataRaw != null) {
+        userProvider.setUser(userDataRaw);
+      }
+      if (accessInfoRaw != null) {
+        userProvider.setAccessInfo(accessInfoRaw);
+      }
+      print('Datos guardados en el Provider.');
+    }
   }
 
 
@@ -53,27 +81,8 @@ class _HomeProfessor extends State<HomeProfessor> {
   }
 
 
-  void _addLocation(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddLocationScreen()),
-    );
 
-    if (result != null) {
-      _fetchLocations();
-    }
-  }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      if (index == 1) {
-        _addLocation(context);
-      } else {
-        print("Item seleccionado : $index");
-      }
-    });
-  }
 
   void _onLocationCardTapped(Location location) {
     print('Tarjeta clickeada: ${location.name} (ID: ${location.id})');
@@ -215,25 +224,7 @@ class _HomeProfessor extends State<HomeProfessor> {
         ),
       ),
 
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined, color: Colors.grey),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add, color: Colors.grey),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline, color: Colors.grey),
-            label: '',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onItemTapped,
-      ),
+      bottomNavigationBar: const BottomBarNavigationProfessor()
     );
   }
 }

@@ -67,7 +67,7 @@ class LocationDisplayCard extends StatelessWidget {
                       const SizedBox(height: 4.0),
 
                       const SizedBox(height: 8.0),
-                      // Hora y Fecha del evento
+
                       Text(
                         '$startTime - $endTime',
                         style: const TextStyle(

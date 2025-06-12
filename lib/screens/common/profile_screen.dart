@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user_data.dart';
+import '../../models/user_role.dart';
 import '../../providers/user_provider.dart';
-import '../common/about_us.dart';
-import '../common/change_password_screen.dart';
-import '../common/contact_us.dart';
-import '../common/update_user_screen.dart';
-import 'bottom_bar_navigation.dart';
+import 'about_us_screen.dart';
+import 'change_password_screen.dart';
+import 'contact_us_screen.dart';
+import 'update_user_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+
+  final UserRole userRole;
+  final Widget? customBottomNavigationBar;
+
+  const ProfileScreen({
+    super.key,
+    required this.userRole,
+    this.customBottomNavigationBar,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreen();
@@ -22,8 +30,6 @@ class _ProfileScreen extends State<ProfileScreen> {
     final userProvider = Provider.of<UserProvider>(context);
     final UserData? currentUser = userProvider.currentUser;
 
-    String displayUserName = currentUser?.name ?? 'Usuario';
-    String displayUserEmail = currentUser?.email ?? 'No email available';
     String profileImagePath =
         currentUser?.profileImageUrl ?? 'assets/profile_default.jpg';
 
@@ -43,9 +49,9 @@ class _ProfileScreen extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            const Center(
+            Center(
               child: Text(
-                'User',
+                currentUser!.name as String,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
@@ -117,7 +123,7 @@ class _ProfileScreen extends State<ProfileScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomBarNavigation(),
+      bottomNavigationBar: widget.customBottomNavigationBar,
     );
   }
 }

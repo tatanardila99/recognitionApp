@@ -1,6 +1,6 @@
 // student_home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation.dart';
+import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation_student.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
@@ -138,7 +138,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomBarNavigation(),
+      bottomNavigationBar: const BottomBarNavigationStudent(),
     );
   }
 }
