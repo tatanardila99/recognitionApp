@@ -35,7 +35,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   String _formatTime(String dateString) {
     try {
       final dateTime = DateTime.parse(dateString);
-      return DateFormat('HH:mm EEEE, d MMMM yyyy').format(dateTime);
+      return DateFormat('HH:mm EEEE, d MMMM yyyy', 'es_ES').format(dateTime);
     } catch (e) {
       return dateString;
     }
@@ -81,7 +81,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Welcome, ${currentUser?.name ?? 'Estudiante'}",
+                  "Bienvenido, ${currentUser?.name ?? 'Estudiante'}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -97,7 +97,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Income history",
+                "Historial de ingresos",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -138,7 +138,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                               ),
                             ),
                             title: Text(
-                              access.locationName ?? 'Laboratorio',
+                              access.locationName ?? 'No data',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
