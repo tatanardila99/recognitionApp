@@ -1,4 +1,3 @@
-// student_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation_student.dart';
 import 'package:intl/intl.dart';
@@ -15,41 +14,39 @@ class StudentHomeScreen extends StatefulWidget {
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
+    if (args != null &&
+        !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
       List<dynamic>? accessInfoRaw = args['accessInfo'];
       Map<String, dynamic>? userDataRaw = args['userData'];
 
-      if (userDataRaw != null) {
-        userProvider.setUser(userDataRaw);
-      }
-      if (accessInfoRaw != null) {
-        userProvider.setAccessInfo(accessInfoRaw);
-      }
-      print('Datos guardados en el Provider.');
+      if (userDataRaw != null) userProvider.setUser(userDataRaw);
+      if (accessInfoRaw != null) userProvider.setAccessInfo(accessInfoRaw);
     }
   }
 
-
-  String _formatDate(String dateString) {
+  String _formatTime(String dateString) {
     try {
       final dateTime = DateTime.parse(dateString);
-      return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+      return DateFormat('HH:mm EEEE, d MMMM yyyy').format(dateTime);
     } catch (e) {
-      print('Error al formatear fecha: $e');
       return dateString;
     }
   }
+
+  final List<Color> cardColors = [
+    Colors.blue.shade900,
+    Colors.lightBlue.shade400,
+    Colors.pinkAccent.shade100,
+    Colors.cyan.shade400,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -57,84 +54,115 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     final UserData? currentUser = userProvider.currentUser;
     final List<AccessEntry>? currentAccessInfo = userProvider.currentAccessInfo;
 
-
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+        children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16.0,
-              bottom: 16.0,
+            height: 220,
+            decoration: const BoxDecoration(
+              color: Color(0xFF899DD9),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
             ),
-            decoration: const BoxDecoration(color: Color(0xFF899DD9)),
-            height: 200,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 20,
+              bottom: 20,
+            ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[300],
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, size: 50, color: Color(0xFF899DD9)),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  currentUser?.name ?? "Usuario",
+                  "Welcome, ${currentUser?.name ?? 'Estudiante'}",
                   style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
                     color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
+
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              'Historial de Accesos:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.blueAccent,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Income history",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
 
           Expanded(
-            child: currentAccessInfo == null || currentAccessInfo.isEmpty
-                ? const Center(child: Text('No hay registros de acceso disponibles.'))
-                : SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const <DataColumn>[
-                    DataColumn(label: Text('Ubicación')),
-                    DataColumn(label: Text('Fecha y Hora')),
-                    DataColumn(label: Text('Resultado')),
-                    DataColumn(label: Text('Confianza')),
-                  ],
-                  rows: currentAccessInfo.map<DataRow>((access) {
-                    return DataRow(
-                      cells: <DataCell>[
-                        DataCell(Text(access.locationName ?? '')),
-                        DataCell(Text(_formatDate(access.dateEntry ?? ''))),
-                        DataCell(Text(access.result ?? '')),
-                        DataCell(Text('${access.confidence?.toStringAsFixed(2) ?? 'N/A'}%')),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+            child:
+                currentAccessInfo == null || currentAccessInfo.isEmpty
+                    ? const Center(child: Text("No access records available."))
+                    : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: currentAccessInfo.length,
+                      itemBuilder: (context, index) {
+                        final access = currentAccessInfo[index];
+                        final cardColor = cardColors[index % cardColors.length];
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(16),
+                            leading: Container(
+                              width: 8,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            title: Text(
+                              access.locationName ?? 'Laboratorio',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                const Text("ClassRoom Register"),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatTime(access.dateEntry ?? ''),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
           ),
         ],
       ),
