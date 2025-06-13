@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:face_camera/face_camera.dart';
+import 'package:uts_recognitionapp/screens/reviewPhotoPage.dart';
 import 'package:uts_recognitionapp/services/service.dart';
 
 class FaceIdSignUp extends StatelessWidget {
@@ -40,17 +41,27 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
     _cameraController = FaceCameraController(
       autoCapture: true,
       defaultCameraLens: CameraLens.front,
-      onCapture: (File? image) {
-        setState(() {
-          _capturedFace = image;
-          _isCameraActive = false;
-          _cameraMessage = 'Rostro capturado!';
-          Future.delayed(const Duration(seconds: 3), () {
+      onCapture: (File? image) async {
+        if (image != null) {
+          // Detener cámara y mostrar pantalla de revisión
+          _cameraController?.stopImageStream();
+
+          final confirm = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(builder: (_) => ReviewPhotoPage(image: image)),
+          );
+
+          if (confirm == true) {
             setState(() {
-              _cameraMessage = 'Tomar foto';
+              _capturedFace = image;
+              _isCameraActive = false;
+              _cameraMessage = 'Rostro capturado!';
             });
-          });
-        });
+          } else {
+            // Volver a activar la cámara
+            _cameraController?.startImageStream();
+          }
+        }
       },
       onFaceDetected: (Face? face) {},
     );
