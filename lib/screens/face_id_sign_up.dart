@@ -77,10 +77,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
       child: Stack(
         children: [
           Positioned(
-            top: 0,
+            top: -50,
             left: 0,
-            width: 150,
-            height: 150,
+            width: 200,
+            height: 200,
             child: Image.asset('assets/shape.png'),
           ),
           Padding(
@@ -89,13 +89,13 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
               key: _formKey,
               child: ListView(
                 children: <Widget>[
-                  SizedBox(height: 70),
+                  SizedBox(height: 60),
                   Text(
                     "Bienvenido a bordo!",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Text(
                     "Te ayudamos a gestionar un acceso seguro",
                     style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
@@ -105,6 +105,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20.0,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(22.0),
                         borderSide: BorderSide.none,
@@ -124,6 +128,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20.0,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(22.0),
                         borderSide: BorderSide.none,
@@ -202,6 +210,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20.0,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(22.0),
                         borderSide: BorderSide.none,
@@ -219,19 +231,23 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     },
                   ),
                   SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: _startCamera,
-                    child: Container(
-                      width: 105,
-                      height: 105,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        image: DecorationImage(
-                          image: AssetImage('assets/camera.png'),
-                          fit: BoxFit.fitHeight,
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _startCamera,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            image: DecorationImage(
+                              image: AssetImage('assets/camera.png'),
+                              fit: BoxFit.fitHeight,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -252,44 +268,49 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       ),
                     ),
                   SizedBox(height: 40),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF899DD9),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate() &&
-                          _capturedFace != null) {
-                        final String name = _nameController.text;
-                        final String email = _emailController.text;
-                        final String password = _passwordController.text;
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF899DD9),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 13.0,
+                            horizontal: 100.0,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate() &&
+                              _capturedFace != null) {
+                            final String name = _nameController.text;
+                            final String email = _emailController.text;
+                            final String password = _passwordController.text;
 
-                        bool success = await _backendService.sendDataRegister(
-                          name,
-                          email,
-                          password,
-                          "6434222225", // de momento esta quemado
-                          _selectedRol!,
-                          _capturedFace,
-                        );
+                            bool success = await _backendService
+                                .sendDataRegister(
+                                  name,
+                                  email,
+                                  password,
+                                  "6434222225", // de momento esta quemado
+                                  _selectedRol!,
+                                  _capturedFace,
+                                );
 
-                        if (success) {
-                          print('Registro exitoso!');
-                        } else {
-                          print('Error al registrar');
-                        }
-                      }
-                    },
-                    child: const Text(
-                      'Registrate',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0),
-                    ),
+                            if (success) {
+                              print('Registro exitoso!');
+                            } else {
+                              print('Error al registrar');
+                            }
+                          }
+                        },
+                        child: const Text(
+                          'Registrate',
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   Row(
@@ -299,7 +320,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                       InkWell(
                         child: Text(
                           'Iniciar sesión',
-                          style: TextStyle(color: Color(0xFF50C2C9)),
+                          style: TextStyle(
+                            color: Color(0xFF50C2C9),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         onTap: () {
                           Navigator.pushNamed(context, '/sign');
@@ -313,7 +337,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
           ),
           if (_isCameraActive && _cameraController != null)
             Positioned(
-              top: 0,
+              top: 100,
               bottom: 0,
               left: 0,
               right: 0,

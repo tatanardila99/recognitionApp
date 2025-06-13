@@ -34,10 +34,10 @@ class _LoginPageState extends State<LoginPage> {
         child: Stack(
           children: [
             Positioned(
-              top: 0,
+              top: -50,
               left: 0,
-              width: 195,
-              height: 195,
+              width: 210,
+              height: 210,
               child: Image.asset('assets/shape.png', fit: BoxFit.contain),
             ),
             SingleChildScrollView(
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    const SizedBox(height: 120),
+                    const SizedBox(height: 100),
                     const Text(
                       'Inicio de Sesion',
                       textAlign: TextAlign.center,
@@ -63,15 +63,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          Image.asset('assets/image_login.png', height: 100),
+                          Image.asset('assets/image_login.png', height: 500),
                           Positioned(
                             right: 40,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  width: 50,
-                                  height: 10,
+                                  width: 40,
+                                  height: 20,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[300],
                                     borderRadius: BorderRadius.circular(5),
@@ -107,8 +107,12 @@ class _LoginPageState extends State<LoginPage> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: 'Ingrese el correo',
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 20.0,
+                        ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(22.0),
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
@@ -121,8 +125,12 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         hintText: 'Ingrese la clave',
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 20.0,
+                        ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(22.0),
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
@@ -156,70 +164,81 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 60.0),
-                    ElevatedButton(
-                      onPressed:
-                          _isLoading
-                              ? null
-                              : () async {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                String email = _emailController.text;
-                                String password = _passwordController.text;
+                    Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed:
+                              _isLoading
+                                  ? null
+                                  : () async {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    String email = _emailController.text;
+                                    String password = _passwordController.text;
 
-                                final loginResult = await _backendService
-                                    .sendDataLogin(email, password);
+                                    final loginResult = await _backendService
+                                        .sendDataLogin(email, password);
 
-                                setState(() {
-                                  _isLoading = false;
-                                });
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
 
-                                if (loginResult != null &&
-                                    loginResult['success'] == true) {
-                                  _showMessage("Inicio de sesión exitoso");
+                                    if (loginResult != null &&
+                                        loginResult['success'] == true) {
+                                      _showMessage("Inicio de sesión exitoso");
 
-                                  final List<dynamic>? accessInfo =
-                                      loginResult['access_info'];
+                                      final List<dynamic>? accessInfo =
+                                          loginResult['access_info'];
 
-                                  final Map<String, dynamic>? userData =
-                                      loginResult['user_data'];
+                                      final Map<String, dynamic>? userData =
+                                          loginResult['user_data'];
 
-                                  if (loginResult['message'] == 1) {
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      '/student/home',
-                                      arguments: {
-                                        'accessInfo': accessInfo,
-                                        'userData': userData,
-                                      },
-                                    );
-                                  } else {
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      '/professor/home',
-                                      arguments: {'userData': userData},
-                                    );
-                                  }
-                                } else {
-                                  _showMessage(
-                                    "Error al iniciar sesion, verifica tus credenciales.",
-                                    isError: true,
-                                  );
-                                }
-                              },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF899DD9),
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                                      if (loginResult['message'] == 1) {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          '/student/home',
+                                          arguments: {
+                                            'accessInfo': accessInfo,
+                                            'userData': userData,
+                                          },
+                                        );
+                                      } else {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          '/professor/home',
+                                          arguments: {'userData': userData},
+                                        );
+                                      }
+                                    } else {
+                                      _showMessage(
+                                        "Error al iniciar sesion, verifica tus credenciales.",
+                                        isError: true,
+                                      );
+                                    }
+                                  },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF899DD9),
+
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 13.0,
+                              horizontal: 110.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ingresar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Ingresar',
-                        style: TextStyle(color: Colors.white, fontSize: 18.0),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 30.0),
+                    const SizedBox(height: 8.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
