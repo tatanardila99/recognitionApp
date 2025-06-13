@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/service.dart'; // Asegúrate de que esta ruta sea correcta
+import '../../services/service.dart';
 
 class AddLocationScreen extends StatefulWidget {
   @override
@@ -10,7 +10,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   final _formKey = GlobalKey<FormState>();
   final BackendService _backendService = BackendService();
 
-
   final _locationNameController = TextEditingController();
   final _salonController = TextEditingController();
 
@@ -18,13 +17,12 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   TimeOfDay? _selectedHoraEntrada;
   TimeOfDay? _selectedHoraSalida;
 
-
   final Map<String, String> _edificioOptions = {
     'A': 'Edificio A',
     'B': 'Edificio B',
     'C': 'Edificio C',
     'D': 'Edificio D',
-    'E': 'Edificio E', // Puedes añadir más según necesites
+    'E': 'Edificio E',
   };
 
   @override
@@ -34,20 +32,24 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     super.dispose();
   }
 
-
-  Future<void> _selectTime(BuildContext context, {required bool isEntrada}) async {
+  Future<void> _selectTime(
+    BuildContext context, {
+    required bool isEntrada,
+  }) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: isEntrada
-          ? (_selectedHoraEntrada ?? TimeOfDay.now())
-          : (_selectedHoraSalida ?? TimeOfDay.now()),
-      builder: (BuildContext context, Widget? child) {
+      initialTime:
+          isEntrada
+              ? (_selectedHoraEntrada ?? TimeOfDay.now())
+              : (_selectedHoraSalida ?? TimeOfDay.now()),
+      builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
           child: child!,
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         if (isEntrada) {
@@ -63,56 +65,35 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     if (_formKey.currentState!.validate()) {
       final locationName = _locationNameController.text;
       final edificio = _selectedEdificio;
-      final salon = int.tryParse(_salonController.text); // Convertir a int
+      final salon = int.tryParse(_salonController.text);
       final horaEntrada = _selectedHoraEntrada;
       final horaSalida = _selectedHoraSalida;
 
-
-      if (edificio == null) {
+      if (edificio == null ||
+          horaEntrada == null ||
+          horaSalida == null ||
+          salon == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor selecciona un edificio')),
-        );
-        return;
-      }
-      if (horaEntrada == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor selecciona una hora de entrada')),
-        );
-        return;
-      }
-      if (horaSalida == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor selecciona una hora de salida')),
-        );
-        return;
-      }
-      if (salon == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor ingresa un número de salón válido')),
+          SnackBar(content: Text('Por favor completa todos los campos')),
         );
         return;
       }
 
-      print('Nombre de la ubicación: $locationName');
-      print('Edificio: $edificio');
-      print('Salón: $salon');
-      print('Hora Entrada: ${horaEntrada.format(context)}');
-      print('Hora Salida: ${horaSalida.format(context)}');
-
-
-      bool res = await _backendService.addLocation({
+      final res = await _backendService.addLocation({
         'name': locationName,
         'edificio': edificio,
         'salon': salon,
-        'hora_entrada': '${horaEntrada.hour.toString().padLeft(2, '0')}:${horaEntrada.minute.toString().padLeft(2, '0')}:00',
-        'hora_salida': '${horaSalida.hour.toString().padLeft(2, '0')}:${horaSalida.minute.toString().padLeft(2, '0')}:00',
+        'hora_entrada':
+            '${horaEntrada.hour.toString().padLeft(2, '0')}:${horaEntrada.minute.toString().padLeft(2, '0')}:00',
+        'hora_salida':
+            '${horaSalida.hour.toString().padLeft(2, '0')}:${horaSalida.minute.toString().padLeft(2, '0')}:00',
       });
 
       if (res) {
         Navigator.of(context).pop(locationName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar la ubicación. Intenta de nuevo.')),
+          SnackBar(content: Text('Error al guardar la ubicación')),
         );
       }
     }
@@ -120,164 +101,168 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final inputDecoration =
+        (String label, IconData icon) => InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+          filled: true,
+          fillColor: Colors.grey[100],
+          prefixIcon: Icon(icon),
+        );
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Agregar Ubicación'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-
-              TextFormField(
-                controller: _locationNameController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre de la Ubicación',
-                  hintText: 'Ej: Laboratorio de Física',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.location_on),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa un nombre para la ubicación';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-
-              // Selector de Edificio
-              DropdownButtonFormField<String>(
-                value: _selectedEdificio,
-                decoration: InputDecoration(
-                  labelText: 'Edificio',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.business),
-                ),
-                hint: Text('Selecciona un edificio'),
-                items: _edificioOptions.entries.map((MapEntry<String, String> entry) {
-                  return DropdownMenuItem<String>(
-                    value: entry.key,
-                    child: Text(entry.value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedEdificio = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor selecciona un edificio';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-
-
-              TextFormField(
-                controller: _salonController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Salón',
-                  hintText: 'Ej: 101, 205',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.meeting_room),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el número del salón';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Por favor ingresa un número válido';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-
-
-              GestureDetector(
-                onTap: () => _selectTime(context, isEntrada: true),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    readOnly: true,
-                    controller: TextEditingController(
-                      text: _selectedHoraEntrada == null
-                          ? ''
-                          : _selectedHoraEntrada!.format(context),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Header
+                Column(
+                  children: [
+                    Text(
+                      'Agregar Ubicación',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    decoration: InputDecoration(
-                      labelText: 'Hora de Entrada',
-                      hintText: 'Selecciona la hora de entrada',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.access_time),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Completa los datos para registrar un aula o laboratorio.',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
                     ),
-                    validator: (value) {
-                      if (_selectedHoraEntrada == null) {
-                        return 'Por favor selecciona la hora de entrada';
-                      }
-                      return null;
-                    },
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                TextFormField(
+                  controller: _locationNameController,
+                  decoration: inputDecoration(
+                    'Nombre de la Ubicación',
+                    Icons.location_on,
+                  ),
+                  validator:
+                      (value) => value!.isEmpty ? 'Ingresa un nombre' : null,
+                ),
+                const SizedBox(height: 20),
+
+                DropdownButtonFormField<String>(
+                  value: _selectedEdificio,
+                  decoration: inputDecoration('Edificio', Icons.business),
+                  items:
+                      _edificioOptions.entries
+                          .map(
+                            (entry) => DropdownMenuItem(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (val) => setState(() => _selectedEdificio = val),
+                  validator:
+                      (value) =>
+                          value == null ? 'Selecciona un edificio' : null,
+                ),
+                const SizedBox(height: 20),
+
+                TextFormField(
+                  controller: _salonController,
+                  keyboardType: TextInputType.number,
+                  decoration: inputDecoration(
+                    'Número de Salón',
+                    Icons.meeting_room,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                      return 'Ingresa el número del salón';
+                    if (int.tryParse(value) == null)
+                      return 'Debe ser un número válido';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                GestureDetector(
+                  onTap: () => _selectTime(context, isEntrada: true),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      readOnly: true,
+                      decoration: inputDecoration(
+                        'Hora de Entrada',
+                        Icons.access_time,
+                      ).copyWith(
+                        hintText:
+                            _selectedHoraEntrada?.format(context) ??
+                            'Selecciona la hora',
+                      ),
+                      validator:
+                          (value) =>
+                              _selectedHoraEntrada == null
+                                  ? 'Selecciona la hora de entrada'
+                                  : null,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-
-              GestureDetector(
-                onTap: () => _selectTime(context, isEntrada: false),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    readOnly: true,
-                    controller: TextEditingController(
-                      text: _selectedHoraSalida == null
-                          ? ''
-                          : _selectedHoraSalida!.format(context),
-                    ),
-                    decoration: InputDecoration(
-                      labelText: 'Hora de Salida',
-                      hintText: 'Selecciona la hora de salida',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.access_time),
-                    ),
-                    validator: (value) {
-                      if (_selectedHoraSalida == null) {
-                        return 'Por favor selecciona la hora de salida';
-                      }
-                      // Opcional: Validar que la hora de salida sea posterior a la de entrada
-                      if (_selectedHoraEntrada != null && _selectedHoraSalida != null) {
-                        final entradaMinutes = _selectedHoraEntrada!.hour * 60 + _selectedHoraEntrada!.minute;
-                        final salidaMinutes = _selectedHoraSalida!.hour * 60 + _selectedHoraSalida!.minute;
-                        if (salidaMinutes <= entradaMinutes) {
-                          return 'La hora de salida debe ser posterior a la de entrada';
+                GestureDetector(
+                  onTap: () => _selectTime(context, isEntrada: false),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      readOnly: true,
+                      decoration: inputDecoration(
+                        'Hora de Salida',
+                        Icons.access_time,
+                      ).copyWith(
+                        hintText:
+                            _selectedHoraSalida?.format(context) ??
+                            'Selecciona la hora',
+                      ),
+                      validator: (value) {
+                        if (_selectedHoraSalida == null)
+                          return 'Selecciona la hora de salida';
+                        if (_selectedHoraEntrada != null) {
+                          final entrada = _selectedHoraEntrada!;
+                          final salida = _selectedHoraSalida!;
+                          final entradaMin = entrada.hour * 60 + entrada.minute;
+                          final salidaMin = salida.hour * 60 + salida.minute;
+                          if (salidaMin <= entradaMin) {
+                            return 'La salida debe ser posterior a la entrada';
+                          }
                         }
-                      }
-                      return null;
-                    },
+                        return null;
+                      },
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
+                const SizedBox(height: 32),
 
-              // Botón Guardar Ubicación
-              ElevatedButton.icon(
-                onPressed: _saveLocation,
-                icon: Icon(Icons.save_outlined),
-                label: Text('Guardar Ubicación'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF899DD9),
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                ElevatedButton(
+                  onPressed: _saveLocation,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14.0,
+                      horizontal: 40.0,
+                    ),
+                    child: Text(
+                      'Guardar Ubicación',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 3,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

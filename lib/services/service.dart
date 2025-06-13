@@ -10,10 +10,13 @@ import '../models/location.dart';
 
 class BackendService {
   //final String _baseUrl = 'http://10.0.2.2:3000/api'; // emulador
-  final String _baseUrl = 'http://192.168.1.8:3000/api';   // fisico
+  final String _baseUrl = 'http://192.168.1.11:3000/api'; // fisico
   final http.Client _httpClient = http.Client();
 
-  Future<Map<String, dynamic>> _put(String endpoint, Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> _put(
+    String endpoint,
+    Map<String, dynamic> data,
+  ) async {
     final response = await _httpClient.put(
       Uri.parse('$_baseUrl/$endpoint'),
       headers: {'Content-Type': 'application/json'},
@@ -24,18 +27,20 @@ class BackendService {
       return json.decode(response.body);
     } else {
       final errorBody = json.decode(response.body);
-      throw Exception('Failed to update data: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
+      throw Exception(
+        'Failed to update data: ${response.statusCode} - ${errorBody['message'] ?? response.body}',
+      );
     }
   }
 
   Future<bool> sendDataRegister(
-      String name,
-      String email,
-      String password,
-      String document,
-      String rol,
-      File? face,
-      ) async {
+    String name,
+    String email,
+    String password,
+    String document,
+    String rol,
+    File? face,
+  ) async {
     final Uri uri = Uri.parse('$_baseUrl/register');
 
     try {
@@ -67,7 +72,9 @@ class BackendService {
         return true;
       } else {
         print('Error en el registro. Código: ${response.statusCode}');
-        print('Cuerpo de la respuesta: ${await response.stream.bytesToString()}');
+        print(
+          'Cuerpo de la respuesta: ${await response.stream.bytesToString()}',
+        );
         return false;
       }
     } catch (error) {
@@ -76,7 +83,10 @@ class BackendService {
     }
   }
 
-  Future<Map<String, dynamic>?> sendDataLogin(String email, String password) async {
+  Future<Map<String, dynamic>?> sendDataLogin(
+    String email,
+    String password,
+  ) async {
     final Uri uri = Uri.parse('$_baseUrl/access-list');
 
     try {
@@ -109,15 +119,16 @@ class BackendService {
     }
   }
 
-  Future<Map<String, dynamic>?> validateAccess(File image, String locationId) async {
+  Future<Map<String, dynamic>?> validateAccess(
+    File image,
+    String locationId,
+  ) async {
     final Uri uri = Uri.parse('$_baseUrl/validate-access');
 
     try {
       var request = http.MultipartRequest('POST', uri);
 
-
       request.files.add(await http.MultipartFile.fromPath('image', image.path));
-
 
       request.fields['ubicacion_id'] = locationId;
 
@@ -129,9 +140,8 @@ class BackendService {
         print('Image and location sent successfully. Access granted.');
         String? userName = data['user'];
         double? similarity = data['similarity'];
-        return {'username': userName, 'similarity': similarity };
+        return {'username': userName, 'similarity': similarity};
       } else {
-
         final responseBody = await response.stream.bytesToString();
         print('Error sending image: ${response.statusCode}');
         print('Response body: $responseBody'); // Log the error detail
@@ -175,7 +185,8 @@ class BackendService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
-        List<dynamic> jsonList = responseBody['locations'] as List<dynamic>? ?? [];
+        List<dynamic> jsonList =
+            responseBody['locations'] as List<dynamic>? ?? [];
         return jsonList.map((json) => Location.fromJson(json)).toList();
       } else {
         print('Error al obtener ubicaciones: ${response.statusCode}');
@@ -186,7 +197,6 @@ class BackendService {
       return [];
     }
   }
-
 
   Future<Map<String, dynamic>?> getLocationBYId(int id) async {
     final Uri uri = Uri.parse('$_baseUrl/get-location-by-id/$id');
@@ -209,9 +219,9 @@ class BackendService {
   }
 
   Future<Map<String, dynamic>> updateUser(
-      int userId,
-      Map<String, dynamic> updateData,
-      ) async {
+    int userId,
+    Map<String, dynamic> updateData,
+  ) async {
     final Uri uri = Uri.parse('$_baseUrl/update-user/$userId');
 
     try {
@@ -225,7 +235,9 @@ class BackendService {
         return json.decode(response.body);
       } else {
         final errorBody = json.decode(response.body);
-        throw Exception('Failed to update user: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
+        throw Exception(
+          'Failed to update user: ${response.statusCode} - ${errorBody['message'] ?? response.body}',
+        );
       }
     } catch (e) {
       rethrow;
@@ -233,13 +245,11 @@ class BackendService {
   }
 
   Future<Map<String, dynamic>> updatePassword(
-      int userId,
-      String currentPassword,
-      String newPassword,
-      ) async {
-
+    int userId,
+    String currentPassword,
+    String newPassword,
+  ) async {
     final String endpoint = 'update-user/$userId';
-
 
     final Map<String, dynamic> data = {
       'currentPassword': currentPassword,
@@ -253,5 +263,4 @@ class BackendService {
       rethrow;
     }
   }
-
 }

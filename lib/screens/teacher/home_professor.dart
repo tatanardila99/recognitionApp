@@ -9,7 +9,6 @@ import 'add_location_screen.dart';
 import 'face_rekognition_screen.dart';
 import 'location_card.dart';
 
-
 class HomeProfessor extends StatefulWidget {
   const HomeProfessor({super.key});
 
@@ -18,7 +17,6 @@ class HomeProfessor extends StatefulWidget {
 }
 
 class _HomeProfessor extends State<HomeProfessor> {
-
   final BackendService _backendService = BackendService();
   List<Location> _locations = [];
   bool _isLoading = true;
@@ -33,11 +31,11 @@ class _HomeProfessor extends State<HomeProfessor> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
+    if (args != null &&
+        !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
       List<dynamic>? accessInfoRaw = args['accessInfo'];
@@ -49,10 +47,10 @@ class _HomeProfessor extends State<HomeProfessor> {
       if (accessInfoRaw != null) {
         userProvider.setAccessInfo(accessInfoRaw);
       }
+
       print('Datos guardados en el Provider.');
     }
   }
-
 
   Future<void> _fetchLocations() async {
     setState(() {
@@ -65,7 +63,6 @@ class _HomeProfessor extends State<HomeProfessor> {
       });
     } catch (e) {
       print('Error al cargar ubicaciones: $e');
-
     } finally {
       setState(() {
         _isLoading = false;
@@ -76,157 +73,174 @@ class _HomeProfessor extends State<HomeProfessor> {
   void _startFaceCamera(BuildContext context, int locationId) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FaceCameraScreen(locationId: locationId)),
+      MaterialPageRoute(
+        builder: (context) => FaceCameraScreen(locationId: locationId),
+      ),
     );
   }
 
-
-
-
-
   void _onLocationCardTapped(Location location) {
     print('Tarjeta clickeada: ${location.name} (ID: ${location.id})');
-    print('Iniciando cámara facial para ${location.name}...');
-
-
     _startFaceCamera(context, location.id);
-
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).currentUser;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F4),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 30),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                const Text(
-                  'Hola, Profesor!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined,
-                      color: Colors.black),
-                  onPressed: () {
-
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF86D3FF),
-                    Color(0xFF0075FF),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const Text(
-                          'Control de Acceso',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header con avatar y saludo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 24,
+                        backgroundImage: AssetImage('assets/avatar.png'),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Bienvenido",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Accede con mayor seguridad.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
+                          Text(
+                            "${user?.name ?? 'Profesor'}",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-
-                  Image.asset(
-                    'assets/shield.jpg',
-                    height: 100,
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined, size: 28),
+                    onPressed: () {},
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 30),
 
-            const Text(
-              'Lista de Cursos',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _locations.isEmpty
-                ? const Center(
-              child: Text(
-                'No hay espacios registrados.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
-                : Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 3.0,
+              // Tarjeta de Control de Acceso
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0075FF),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: _locations.length,
-                itemBuilder: (context, index) {
-                  final location = _locations[index];
-
-                  return LocationDisplayCard(
-                    locationName: location.name,
-                    edificio: location.edificio,
-                    salon: location.salon,
-                    startTime: location.horaEntrada,
-                    endTime: location.horaSalida,
-                    locationData: location,
-                    onTap: _onLocationCardTapped,
-                  );
-                },
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Control de Acceso",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Accede con mayor seguridad.",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(
+                      'assets/shield.jpg',
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 24),
+
+              // Título cursos
+              const Text(
+                "Tus Cursos",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Lista de cursos (tarjetas verticales)
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _locations.isEmpty
+                  ? const Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: Center(
+                      child: Text(
+                        'No hay espacios registrados.',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ),
+                  )
+                  : ListView.builder(
+                    itemCount: _locations.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final location = _locations[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: LocationDisplayCard(
+                          locationName: location.name,
+                          edificio: location.edificio,
+                          salon: location.salon,
+                          startTime: location.horaEntrada,
+                          endTime: location.horaSalida,
+                          locationData: location,
+                          onTap: _onLocationCardTapped,
+                        ),
+                      );
+                    },
+                  ),
+            ],
+          ),
         ),
       ),
-
-      bottomNavigationBar: const BottomBarNavigationProfessor()
+      bottomNavigationBar: const BottomBarNavigationProfessor(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddLocationScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF0075FF),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 }
-
-
