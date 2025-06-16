@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/models/user_role.dart';
 import 'package:uts_recognitionapp/screens/common/profile_screen.dart';
 
+import 'home_student.dart';
+
 class BottomBarNavigationStudent extends StatefulWidget {
   const BottomBarNavigationStudent({super.key});
 
@@ -17,8 +19,12 @@ class _BottomBarNavigationStudent extends State<BottomBarNavigationStudent> {
     setState(() {
       _selectedIndex = index;
     });
-
-    if (index == 1) {
+    if (index == 0) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (contex) => const StudentHomeScreen())
+      );
+    } else if (index == 1) {
       Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const ProfileScreen(userRole: UserRole.student, customBottomNavigationBar: const BottomBarNavigationStudent()))

@@ -1,5 +1,6 @@
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
+import 'package:uts_recognitionapp/screens/admin/home_admin.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
 import 'package:uts_recognitionapp/screens/student/home_student.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/success': (context) => const FaceIdSuccessScreen(),
         '/student/home': (context) => const StudentHomeScreen(),
         '/professor/home': (context) => const HomeProfessor(),
+        '/admin/home': (context) => const AdminHomeScreen()
       },
     );
   }

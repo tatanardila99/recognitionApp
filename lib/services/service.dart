@@ -7,10 +7,11 @@ import 'package:http_parser/http_parser.dart';
 import 'package:async/async.dart';
 
 import '../models/location.dart';
+import '../models/user_data.dart';
 
 class BackendService {
   //final String _baseUrl = 'http://10.0.2.2:3000/api'; // emulador
-  final String _baseUrl = 'http://192.168.1.8:3000/api';   // fisico
+  final String _baseUrl = 'http://192.168.1.6:3000/api';   // fisico
   final http.Client _httpClient = http.Client();
 
   Future<Map<String, dynamic>> _put(String endpoint, Map<String, dynamic> data) async {
@@ -251,6 +252,29 @@ class BackendService {
       return response;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<List<UserData>> getAllUsers() async {
+    final Uri uri = Uri.parse('$_baseUrl/users');
+    try {
+      final response = await _httpClient.get(uri);
+
+      if (response.statusCode == 200) {
+
+        final List<dynamic> usersJson = jsonDecode(response.body);
+
+        return usersJson.map((json) => UserData.fromJson(json as Map<String, dynamic>)).toList();
+      } else {
+
+        final errorBody = json.decode(response.body);
+        print('Error fetching users: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
+        return [];
+      }
+    } catch (e) {
+
+      print('Error de conexión al obtener usuarios: $e');
+      return []; 
     }
   }
 

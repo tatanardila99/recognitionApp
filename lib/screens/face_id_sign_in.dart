@@ -194,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                                       final Map<String, dynamic>? userData =
                                           loginResult['user_data'];
 
-                                      if (loginResult['message'] == 1) {
+                                      if (loginResult['rol'] == "estudiante") {
                                         Navigator.pushReplacementNamed(
                                           context,
                                           '/student/home',
@@ -203,11 +203,17 @@ class _LoginPageState extends State<LoginPage> {
                                             'userData': userData,
                                           },
                                         );
-                                      } else {
+                                      } else if (loginResult['rol'] == "profesor") {
                                         Navigator.pushReplacementNamed(
                                           context,
                                           '/professor/home',
                                           arguments: {'userData': userData},
+                                        );
+                                      } else if (loginResult['rol'] == "admin") {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          '/admin/home',
+                                          arguments: {'userData': userData}
                                         );
                                       }
                                     } else {
