@@ -74,7 +74,7 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
       );
 
       if (res != null) {
-        Map<String, dynamic>? location = await _backendService.getLocationBYId(widget.locationId);
+        Map<String, dynamic>? location = await _backendService.getLocationBYId(context, widget.locationId);
         showSuccessDialog(context: context, userName: res['username'], confidence: res['similarity'], locationName: location?['location_name'], onOkPressed: () => {print("ok")});
       } else {
         showToastMessage(context: context, message: "El usuario no se encuentra registrado", isError: true);

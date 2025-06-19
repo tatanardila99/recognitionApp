@@ -65,6 +65,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     try {
       final response = await _backendService.updatePassword(
+        context,
         userId,
         currentPassword,
         newPassword,

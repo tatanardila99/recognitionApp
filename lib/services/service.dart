@@ -1,11 +1,13 @@
-// backend_service.dart
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:async/async.dart';
-
+import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/providers/user_provider.dart';
+import 'package:uts_recognitionapp/services/auth_service.dart';
+import 'package:flutter/material.dart';
 import '../models/location.dart';
 import '../models/user_data.dart';
 
@@ -14,15 +16,38 @@ class BackendService {
   final String _baseUrl = 'http://192.168.1.6:3000/api';   // fisico
   final http.Client _httpClient = http.Client();
 
-  Future<Map<String, dynamic>> _put(String endpoint, Map<String, dynamic> data) async {
+  BackendService._privateConstructor();
+  static final BackendService _instance = BackendService._privateConstructor();
+
+  factory BackendService() {
+    return _instance;
+  }
+
+
+  Map<String, String> _getAuthHeaders() {
+    final String? token = AuthService().authToken;
+    return {
+      'content-type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  void _handleUnauthorized(BuildContext context) {
+    AuthService().logout(context);
+  }
+
+  Future<Map<String, dynamic>> _put(BuildContext context, String endpoint, Map<String, dynamic> data) async {
     final response = await _httpClient.put(
       Uri.parse('$_baseUrl/$endpoint'),
-      headers: {'Content-Type': 'application/json'},
+      headers: _getAuthHeaders(),
       body: json.encode(data),
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
+    } else if (response.statusCode == 401) {
+      _handleUnauthorized(context);
+      throw Exception('Unauthorized: Session expired or invalid token.');
     } else {
       final errorBody = json.decode(response.body);
       throw Exception('Failed to update data: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
@@ -64,59 +89,24 @@ class BackendService {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print('Registro exitoso: $responseBody');
         return true;
       } else {
-        print('Error en el registro. Código: ${response.statusCode}');
-        print('Cuerpo de la respuesta: ${await response.stream.bytesToString()}');
         return false;
       }
     } catch (error) {
-      print('Error de conexión durante el registro: $error');
       return false;
     }
   }
 
-  Future<Map<String, dynamic>?> sendDataLogin(String email, String password) async {
-    final Uri uri = Uri.parse('$_baseUrl/access-list');
 
-    try {
-      final response = await http.post(
-        uri,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print('Inicio de sesión exitoso: $responseData');
-        return responseData;
-      } else if (response.statusCode == 401) {
-        print('Error de inicio de sesión. Credenciales inválidas.');
-        return null;
-      } else {
-        print('Error en el inicio de sesión. Código: ${response.statusCode}');
-        print('Cuerpo de la respuesta: ${response.body}');
-        return null;
-      }
-    } catch (error) {
-      print('Error de conexión durante el inicio de sesión: $error');
-      return null;
-    }
-  }
 
   Future<Map<String, dynamic>?> validateAccess(File image, String locationId) async {
     final Uri uri = Uri.parse('$_baseUrl/validate-access');
 
     try {
       var request = http.MultipartRequest('POST', uri);
-
-
+      
+      request.headers.addAll(_getAuthHeaders());
       request.files.add(await http.MultipartFile.fromPath('image', image.path));
 
 
@@ -127,89 +117,92 @@ class BackendService {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         final Map<String, dynamic> data = json.decode(responseBody);
-        print('Image and location sent successfully. Access granted.');
         String? userName = data['user'];
         double? similarity = data['similarity'];
         return {'username': userName, 'similarity': similarity };
       } else {
-
         final responseBody = await response.stream.bytesToString();
-        print('Error sending image: ${response.statusCode}');
-        print('Response body: $responseBody'); // Log the error detail
         return null;
       }
     } catch (e) {
-      print('Connection error: $e');
       return null;
     }
   }
 
-  Future<bool> addLocation(Map<String, dynamic> locationData) async {
+  Future<bool> addLocation(BuildContext context, Map<String, dynamic> locationData) async {
     final Uri uri = Uri.parse('$_baseUrl/create-location');
 
     try {
       final response = await http.post(
         uri,
-        headers: {'Content-type': 'application/json'},
+        headers: _getAuthHeaders(),
         body: jsonEncode(locationData),
       );
 
       if (response.statusCode == 200) {
         final responseBody = response.body;
-        print('Creación exitosa de la ubicación: $responseBody');
         return true;
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        return false;
       } else {
-        print('Error en la creación de ubicación: ${response.statusCode}');
-        print('Cuerpo de la respuesta: ${response.body}');
         return false;
       }
     } catch (error) {
-      print('Error de conexión durante creación de ubicación: $error');
       return false;
     }
   }
 
-  Future<List<Location>> getLocations() async {
+  Future<List<Location>> getLocations(BuildContext context) async {
     final Uri uri = Uri.parse('$_baseUrl/all-locations');
     try {
-      final response = await http.get(uri);
+      final response = await http.get(
+          uri,
+          headers: _getAuthHeaders()
+      );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
         List<dynamic> jsonList = responseBody['locations'] as List<dynamic>? ?? [];
         return jsonList.map((json) => Location.fromJson(json)).toList();
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        return [];
       } else {
-        print('Error al obtener ubicaciones: ${response.statusCode}');
         return [];
       }
     } catch (error) {
-      print('Error de conexión al obtener ubicaciones: $error');
       return [];
     }
   }
 
 
-  Future<Map<String, dynamic>?> getLocationBYId(int id) async {
+  Future<Map<String, dynamic>?> getLocationBYId(BuildContext context, int id) async {
     final Uri uri = Uri.parse('$_baseUrl/get-location-by-id/$id');
 
     try {
-      final response = await http.get(uri);
+      final response = await http.get(
+          uri,
+          headers: _getAuthHeaders()
+      );
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
 
         Map<String, dynamic> location = responseBody['location'];
         return {'location_name': location['name']};
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        return null;
       } else {
-        print("error al obtener la ubicacion");
         return null;
       }
     } catch (error) {
-      print("Error = $error");
       return null;
     }
   }
 
   Future<Map<String, dynamic>> updateUser(
+      BuildContext context,
       int userId,
       Map<String, dynamic> updateData,
       ) async {
@@ -218,12 +211,18 @@ class BackendService {
     try {
       final response = await _httpClient.put(
         uri,
-        headers: {'Content-Type': 'application/json'},
+        headers: _getAuthHeaders(),
         body: json.encode(updateData),
       );
-
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final responseBody = json.decode(response.body);
+        if (userId == Provider.of<UserProvider>(context, listen: false).currentUser?.id) {
+          Provider.of<UserProvider>(context, listen: false).setUser(responseBody);
+        }
+        return responseBody;
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        throw Exception('Unauthorized: Session expired or invalid token.');
       } else {
         final errorBody = json.decode(response.body);
         throw Exception('Failed to update user: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
@@ -234,47 +233,67 @@ class BackendService {
   }
 
   Future<Map<String, dynamic>> updatePassword(
+      BuildContext context,
       int userId,
       String currentPassword,
       String newPassword,
       ) async {
 
     final String endpoint = 'update-user/$userId';
-
-
     final Map<String, dynamic> data = {
       'currentPassword': currentPassword,
       'password_hash': newPassword,
     };
 
     try {
-      final response = await _put(endpoint, data);
+      final response = await _put(context, endpoint, data);
       return response;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<UserData>> getAllUsers() async {
+  Future<List<UserData>> getAllUsers(BuildContext context) async {
     final Uri uri = Uri.parse('$_baseUrl/users');
     try {
-      final response = await _httpClient.get(uri);
+      final response = await _httpClient.get(
+          uri,
+          headers: _getAuthHeaders()
+      );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> usersJson = jsonDecode(response.body);
-
         return usersJson.map((json) => UserData.fromJson(json as Map<String, dynamic>)).toList();
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        return [];
       } else {
-
-        final errorBody = json.decode(response.body);
-        print('Error fetching users: ${response.statusCode} - ${errorBody['message'] ?? response.body}');
         return [];
       }
     } catch (e) {
-
-      print('Error de conexión al obtener usuarios: $e');
       return []; 
+    }
+  }
+
+  Future<bool> deleteUser(BuildContext context, int userId) async {
+    final Uri uri = Uri.parse('$_baseUrl/delete-user/$userId');
+
+    try {
+      final response = await _httpClient.delete(
+        uri,
+        headers: _getAuthHeaders()
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 

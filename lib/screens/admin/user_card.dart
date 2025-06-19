@@ -1,5 +1,3 @@
-// lib/widgets/user_card.dart
-
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/models/user_data.dart';
 import 'package:uts_recognitionapp/screens/admin/user_details.dart';
@@ -7,8 +5,8 @@ import 'package:uts_recognitionapp/screens/admin/user_details.dart';
 
 class UserCard extends StatelessWidget {
   final UserData user;
-
-  const UserCard({Key? key, required this.user}) : super(key: key);
+  final VoidCallback? onUserUpdated;
+  const UserCard({Key? key, required this.user, this.onUserUpdated}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +19,16 @@ class UserCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => UserDetailsPage(user: user),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              onUserUpdated?.call();
+            }
+          });
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),

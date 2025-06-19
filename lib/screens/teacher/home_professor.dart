@@ -59,7 +59,7 @@ class _HomeProfessor extends State<HomeProfessor> {
       _isLoading = true;
     });
     try {
-      final fetchedLocations = await _backendService.getLocations();
+      final fetchedLocations = await _backendService.getLocations(context);
       setState(() {
         _locations = fetchedLocations;
       });

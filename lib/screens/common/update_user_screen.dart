@@ -77,7 +77,7 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
       };
 
 
-      final response = await _backendService.updateUser(userId, updateData);
+      final response = await _backendService.updateUser(context, userId, updateData);
 
       setState(() {
         _successMessage = response['message'] ?? 'User data updated successfully!';

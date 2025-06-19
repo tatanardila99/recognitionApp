@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/providers/user_provider.dart';
+import 'package:uts_recognitionapp/services/auth_service.dart';
 
 import '../services/service.dart';
 
@@ -177,50 +180,48 @@ class _LoginPageState extends State<LoginPage> {
                                     String email = _emailController.text;
                                     String password = _passwordController.text;
 
-                                    final loginResult = await _backendService
-                                        .sendDataLogin(email, password);
+                                    try {
+                                      final Map<String, dynamic> result =
+                                          await AuthService().login(
+                                            context,
+                                            email,
+                                            password,
+                                          );
 
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                      if (result['success'] == true) {
+                                        _showMessage(result['message']);
 
-                                    if (loginResult != null &&
-                                        loginResult['success'] == true) {
-                                      _showMessage("Inicio de sesión exitoso");
-
-                                      final List<dynamic>? accessInfo =
-                                          loginResult['access_info'];
-
-                                      final Map<String, dynamic>? userData =
-                                          loginResult['user_data'];
-
-                                      if (loginResult['rol'] == "estudiante") {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          '/student/home',
-                                          arguments: {
-                                            'accessInfo': accessInfo,
-                                            'userData': userData,
-                                          },
-                                        );
-                                      } else if (loginResult['rol'] == "profesor") {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          '/professor/home',
-                                          arguments: {'userData': userData},
-                                        );
-                                      } else if (loginResult['rol'] == "admin") {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          '/admin/home',
-                                          arguments: {'userData': userData}
-                                        );
+                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                                        final String? userRole = userProvider.currentUser?.rol;
+                                        print('rol ==> $userRole');
+                                        switch (userRole) {
+                                          case 'estudiante':
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              '/student/home',
+                                            );
+                                          case 'profesor':
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              '/professor/home',
+                                            );
+                                          case 'admin':
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              '/admin/home',
+                                            );
+                                        }
+                                      } else {
+                                        _showMessage(result['message'], isError: true);
                                       }
-                                    } else {
+                                    } catch (e) {
                                       _showMessage(
-                                        "Error al iniciar sesion, verifica tus credenciales.",
-                                        isError: true,
+                                        "Error de conexion o servidor: $e",
                                       );
+                                    } finally {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
                                     }
                                   },
                           style: ElevatedButton.styleFrom(

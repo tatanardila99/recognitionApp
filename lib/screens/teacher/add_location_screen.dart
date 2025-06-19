@@ -100,7 +100,9 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       print('Hora Salida: ${horaSalida.format(context)}');
 
 
-      bool res = await _backendService.addLocation({
+      bool res = await _backendService.addLocation(
+        context,
+          {
         'name': locationName,
         'edificio': edificio,
         'salon': salon,
