@@ -1,5 +1,3 @@
-// lib/services/auth_service.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart'; // Import Provider
@@ -64,12 +62,10 @@ class AuthService {
         return {'success': false, 'message': responseData['message'] ?? 'Credenciales inválidas.'};
       } else {
         logout(context); // Clear state on unexpected error
-        print('Error en el inicio de sesión. Código: ${response.statusCode}, Cuerpo: ${response.body}');
         return {'success': false, 'message': responseData['message'] ?? 'Error desconocido al iniciar sesión.'};
       }
     } catch (e) {
       logout(context);
-      print('Error de conexión durante el inicio de sesión: $e');
       return {'success': false, 'message': 'Error de conexión durante el inicio de sesión: $e'};
     }
   }

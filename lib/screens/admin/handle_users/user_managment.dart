@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:uts_recognitionapp/models/user_data.dart';
-import 'package:uts_recognitionapp/screens/admin/user_card.dart';
+import 'package:uts_recognitionapp/screens/admin/handle_users/user_card.dart';
 import 'package:uts_recognitionapp/services/service.dart';
 
 class UserManagementScreen extends StatefulWidget {

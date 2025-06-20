@@ -162,7 +162,6 @@ class BackendService {
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
-
         List<dynamic> jsonList = responseBody['locations'] as List<dynamic>? ?? [];
         return jsonList.map((json) => Location.fromJson(json)).toList();
       } else if (response.statusCode == 401) {
@@ -294,6 +293,33 @@ class BackendService {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<List<Location>> getLocationsByResponsible(BuildContext context) async {
+    final Uri uri = Uri.parse('$_baseUrl/my-locations');
+
+    try {
+      final response = await _httpClient.get(
+        uri,
+        headers: _getAuthHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        List<dynamic> jsonList = responseBody['locations'] as List<dynamic>? ?? [];
+        return jsonList.map((json) => Location.fromJson(json)).toList();
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        
+        _handleUnauthorized(context);
+        final errorBody = json.decode(response.body);
+        return [];
+      } else {
+        final errorBody = json.decode(response.body);
+        return [];
+      }
+    } catch (e) {
+      return [];
     }
   }
 

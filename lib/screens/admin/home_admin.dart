@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uts_recognitionapp/models/user_role.dart';
-import 'package:uts_recognitionapp/screens/admin/user_managment.dart';
+import 'package:uts_recognitionapp/screens/admin/handle_users/user_managment.dart';
 
 import '../../providers/user_provider.dart';
 import '../common/profile_screen.dart';
+import 'handle_locations/all_locations.dart';
 
 
 
@@ -38,7 +39,7 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
         if (accessInfoRaw != null) {
           userProvider.setAccessInfo(accessInfoRaw);
         }
-        print('Datos guardados en el Provider.');
+
       });
     }
   }
@@ -199,15 +200,14 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => UserManagementScreen()));
         }),
         _buildFeatureCard(context, 'Ubicaciones', "assets/location-image.png", Color(0xFFF39C12), () {
-          print('Ubicaciones');
-
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LocationsScreen()));
         }),
         _buildFeatureCard(context, 'Responssables', "assets/responsibles-image.png", Color(0xFFFD6084), () {
-          print('Responsables');
+
 
         }),
         _buildFeatureCard(context, 'Horarios', "assets/schedules-image.png", Color(0xFF045071), () {
-          print('Horarios');
+
    
         }),
       ],

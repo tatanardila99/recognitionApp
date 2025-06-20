@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/models/user_data.dart'; // Make sure this path is correct
 
-import '../../services/service.dart'; // Import your BackendService
+import '../../../services/service.dart'; // Import your BackendService
 
 class UserDetailsPage extends StatefulWidget {
   final UserData user;

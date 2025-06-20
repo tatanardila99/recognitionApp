@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/models/user_data.dart';
-import 'package:uts_recognitionapp/screens/admin/user_details.dart';
+import 'package:uts_recognitionapp/screens/admin/handle_users/user_details.dart';
 
 
 class UserCard extends StatelessWidget {
