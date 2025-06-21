@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/service.dart'; // Asegúrate de que esta ruta sea correcta
 
 class AddLocationScreen extends StatefulWidget {
+  const AddLocationScreen({super.key});
+
   @override
   _AddLocationScreenState createState() => _AddLocationScreenState();
 }
@@ -10,7 +14,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   final _formKey = GlobalKey<FormState>();
   final BackendService _backendService = BackendService();
 
-
   final _locationNameController = TextEditingController();
   final _salonController = TextEditingController();
 
@@ -18,13 +21,11 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   TimeOfDay? _selectedHoraEntrada;
   TimeOfDay? _selectedHoraSalida;
 
-
   final Map<String, String> _edificioOptions = {
     'A': 'Edificio A',
     'B': 'Edificio B',
     'C': 'Edificio C',
     'D': 'Edificio D',
-    'E': 'Edificio E', // Puedes añadir más según necesites
   };
 
   @override
@@ -34,13 +35,16 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     super.dispose();
   }
 
-
-  Future<void> _selectTime(BuildContext context, {required bool isEntrada}) async {
+  Future<void> _selectTime(
+    BuildContext context, {
+    required bool isEntrada,
+  }) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: isEntrada
-          ? (_selectedHoraEntrada ?? TimeOfDay.now())
-          : (_selectedHoraSalida ?? TimeOfDay.now()),
+      initialTime:
+          isEntrada
+              ? (_selectedHoraEntrada ?? TimeOfDay.now())
+              : (_selectedHoraSalida ?? TimeOfDay.now()),
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -60,13 +64,15 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   }
 
   void _saveLocation() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final int? responsibleId = userProvider.currentUser?.id;
+
     if (_formKey.currentState!.validate()) {
       final locationName = _locationNameController.text;
       final edificio = _selectedEdificio;
-      final salon = int.tryParse(_salonController.text); // Convertir a int
+      final salon = int.tryParse(_salonController.text);
       final horaEntrada = _selectedHoraEntrada;
       final horaSalida = _selectedHoraSalida;
-
 
       if (edificio == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -88,33 +94,31 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
       }
       if (salon == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor ingresa un número de salón válido')),
+          SnackBar(
+            content: Text('Por favor ingresa un número de salón válido'),
+          ),
         );
         return;
       }
 
-      print('Nombre de la ubicación: $locationName');
-      print('Edificio: $edificio');
-      print('Salón: $salon');
-      print('Hora Entrada: ${horaEntrada.format(context)}');
-      print('Hora Salida: ${horaSalida.format(context)}');
-
-
-      bool res = await _backendService.addLocation(
-        context,
-          {
+      bool res = await _backendService.addLocation(context, {
         'name': locationName,
         'edificio': edificio,
         'salon': salon,
-        'hora_entrada': '${horaEntrada.hour.toString().padLeft(2, '0')}:${horaEntrada.minute.toString().padLeft(2, '0')}:00',
-        'hora_salida': '${horaSalida.hour.toString().padLeft(2, '0')}:${horaSalida.minute.toString().padLeft(2, '0')}:00',
+        'hora_entrada':
+            '${horaEntrada.hour.toString().padLeft(2, '0')}:${horaEntrada.minute.toString().padLeft(2, '0')}:00',
+        'hora_salida':
+            '${horaSalida.hour.toString().padLeft(2, '0')}:${horaSalida.minute.toString().padLeft(2, '0')}:00',
+        'responsible_id': responsibleId,
       });
 
       if (res) {
         Navigator.of(context).pop(locationName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar la ubicación. Intenta de nuevo.')),
+          SnackBar(
+            content: Text('Error al guardar la ubicación. Intenta de nuevo.'),
+          ),
         );
       }
     }
@@ -123,9 +127,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Agregar Ubicación'),
-      ),
+      appBar: AppBar(title: Text('Agregar Ubicación')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -133,7 +135,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-
               TextFormField(
                 controller: _locationNameController,
                 decoration: InputDecoration(
@@ -151,7 +152,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               ),
               SizedBox(height: 20),
 
-              // Selector de Edificio
               DropdownButtonFormField<String>(
                 value: _selectedEdificio,
                 decoration: InputDecoration(
@@ -160,12 +160,15 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                   prefixIcon: Icon(Icons.business),
                 ),
                 hint: Text('Selecciona un edificio'),
-                items: _edificioOptions.entries.map((MapEntry<String, String> entry) {
-                  return DropdownMenuItem<String>(
-                    value: entry.key,
-                    child: Text(entry.value),
-                  );
-                }).toList(),
+                items:
+                    _edificioOptions.entries.map((
+                      MapEntry<String, String> entry,
+                    ) {
+                      return DropdownMenuItem<String>(
+                        value: entry.key,
+                        child: Text(entry.value),
+                      );
+                    }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedEdificio = newValue;
@@ -179,7 +182,6 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 },
               ),
               SizedBox(height: 20),
-
 
               TextFormField(
                 controller: _salonController,
@@ -202,16 +204,16 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               ),
               SizedBox(height: 20),
 
-
               GestureDetector(
                 onTap: () => _selectTime(context, isEntrada: true),
                 child: AbsorbPointer(
                   child: TextFormField(
                     readOnly: true,
                     controller: TextEditingController(
-                      text: _selectedHoraEntrada == null
-                          ? ''
-                          : _selectedHoraEntrada!.format(context),
+                      text:
+                          _selectedHoraEntrada == null
+                              ? ''
+                              : _selectedHoraEntrada!.format(context),
                     ),
                     decoration: InputDecoration(
                       labelText: 'Hora de Entrada',
@@ -230,16 +232,16 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               ),
               SizedBox(height: 20),
 
-
               GestureDetector(
                 onTap: () => _selectTime(context, isEntrada: false),
                 child: AbsorbPointer(
                   child: TextFormField(
                     readOnly: true,
                     controller: TextEditingController(
-                      text: _selectedHoraSalida == null
-                          ? ''
-                          : _selectedHoraSalida!.format(context),
+                      text:
+                          _selectedHoraSalida == null
+                              ? ''
+                              : _selectedHoraSalida!.format(context),
                     ),
                     decoration: InputDecoration(
                       labelText: 'Hora de Salida',
@@ -251,10 +253,15 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                       if (_selectedHoraSalida == null) {
                         return 'Por favor selecciona la hora de salida';
                       }
-                      // Opcional: Validar que la hora de salida sea posterior a la de entrada
-                      if (_selectedHoraEntrada != null && _selectedHoraSalida != null) {
-                        final entradaMinutes = _selectedHoraEntrada!.hour * 60 + _selectedHoraEntrada!.minute;
-                        final salidaMinutes = _selectedHoraSalida!.hour * 60 + _selectedHoraSalida!.minute;
+
+                      if (_selectedHoraEntrada != null &&
+                          _selectedHoraSalida != null) {
+                        final entradaMinutes =
+                            _selectedHoraEntrada!.hour * 60 +
+                            _selectedHoraEntrada!.minute;
+                        final salidaMinutes =
+                            _selectedHoraSalida!.hour * 60 +
+                            _selectedHoraSalida!.minute;
                         if (salidaMinutes <= entradaMinutes) {
                           return 'La hora de salida debe ser posterior a la de entrada';
                         }
@@ -266,7 +273,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               ),
               SizedBox(height: 20),
 
-              // Botón Guardar Ubicación
+
               ElevatedButton.icon(
                 onPressed: _saveLocation,
                 icon: Icon(Icons.save_outlined),

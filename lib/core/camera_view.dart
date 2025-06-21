@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -6,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class CameraView extends StatefulWidget {
   final Function(String?) onPictureTaken;
 
-  const CameraView({Key? key, required this.onPictureTaken}) : super(key: key);
+  const CameraView({super.key, required this.onPictureTaken});
 
   @override
   _CameraViewState createState() => _CameraViewState();
@@ -25,7 +24,10 @@ class _CameraViewState extends State<CameraView> {
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
     if (_cameras.isNotEmpty) {
-      _cameraController = CameraController(_cameras.first, ResolutionPreset.medium);
+      _cameraController = CameraController(
+        _cameras.first,
+        ResolutionPreset.medium,
+      );
       try {
         await _cameraController!.initialize();
         if (!mounted) {
@@ -67,7 +69,10 @@ class _CameraViewState extends State<CameraView> {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: kIsWeb ? const Text('Camera not supported on Web') : CameraPreview(_cameraController!),
+      child:
+          kIsWeb
+              ? const Text('Camera not supported on Web')
+              : CameraPreview(_cameraController!),
     );
   }
 }

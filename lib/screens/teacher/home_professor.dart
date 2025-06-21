@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:uts_recognitionapp/screens/common/profile_screen.dart';
 import 'package:uts_recognitionapp/screens/teacher/bottom_bar_navigation_professor.dart';
 import '../../models/location.dart';
 import '../../providers/user_provider.dart';
 import '../../services/service.dart';
-import 'add_location_screen.dart';
 import 'face_rekognition_screen.dart';
 import 'location_card.dart';
-
 
 class HomeProfessor extends StatefulWidget {
   const HomeProfessor({super.key});
@@ -18,17 +15,23 @@ class HomeProfessor extends StatefulWidget {
 }
 
 class _HomeProfessor extends State<HomeProfessor> {
-
   final BackendService _backendService = BackendService();
   List<Location> _locations = [];
   bool _isLoading = true;
+  int? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _fetchLocations();
+    _currentUserId =
+        Provider.of<UserProvider>(context, listen: false).currentUser?.id;
+    if (_currentUserId != null) {
+      _fetchLocations();
+    } else {
+      print("no esta llegando el id");
+    }
   }
-
+  /*
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -51,21 +54,21 @@ class _HomeProfessor extends State<HomeProfessor> {
       }
       print('Datos guardados en el Provider.');
     }
-  }
-
+  }*/
 
   Future<void> _fetchLocations() async {
     setState(() {
       _isLoading = true;
     });
     try {
-      final fetchedLocations = await _backendService.getLocations(context);
+      final fetchedLocations = await _backendService.getLocationsByResponsible(
+        context,
+      );
       setState(() {
         _locations = fetchedLocations;
       });
     } catch (e) {
       print('Error al cargar ubicaciones: $e');
-
     } finally {
       setState(() {
         _isLoading = false;
@@ -76,21 +79,17 @@ class _HomeProfessor extends State<HomeProfessor> {
   void _startFaceCamera(BuildContext context, int locationId) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FaceCameraScreen(locationId: locationId)),
+      MaterialPageRoute(
+        builder: (context) => FaceCameraScreen(locationId: locationId),
+      ),
     );
   }
-
-
-
-
 
   void _onLocationCardTapped(Location location) {
     print('Tarjeta clickeada: ${location.name} (ID: ${location.id})');
     print('Iniciando cámara facial para ${location.name}...');
 
-
     _startFaceCamera(context, location.id);
-
   }
 
   @override
@@ -116,11 +115,11 @@ class _HomeProfessor extends State<HomeProfessor> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined,
-                      color: Colors.black),
-                  onPressed: () {
-
-                  },
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {},
                 ),
               ],
             ),
@@ -131,10 +130,7 @@ class _HomeProfessor extends State<HomeProfessor> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF86D3FF),
-                    Color(0xFF0075FF),
-                  ],
+                  colors: [Color(0xFF86D3FF), Color(0xFF0075FF)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -156,20 +152,14 @@ class _HomeProfessor extends State<HomeProfessor> {
                         const SizedBox(height: 8),
                         const Text(
                           'Accede con mayor seguridad.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.white),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 10),
 
-                  Image.asset(
-                    'assets/shield.jpg',
-                    height: 100,
-                  ),
+                  Image.asset('assets/shield.jpg', height: 100),
                 ],
               ),
             ),
@@ -189,44 +179,43 @@ class _HomeProfessor extends State<HomeProfessor> {
                 ? const Center(child: CircularProgressIndicator())
                 : _locations.isEmpty
                 ? const Center(
-              child: Text(
-                'No hay espacios registrados.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
+                  child: Text(
+                    'No hay espacios registrados.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
                 : Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 3.0,
-                ),
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: _locations.length,
-                itemBuilder: (context, index) {
-                  final location = _locations[index];
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 3.0,
+                        ),
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _locations.length,
+                    itemBuilder: (context, index) {
+                      final location = _locations[index];
 
-                  return LocationDisplayCard(
-                    locationName: location.name,
-                    edificio: location.edificio,
-                    salon: location.salon,
-                    startTime: location.horaEntrada,
-                    endTime: location.horaSalida,
-                    locationData: location,
-                    onTap: _onLocationCardTapped,
-                  );
-                },
-              ),
-            ),
+                      return LocationDisplayCard(
+                        locationName: location.name,
+                        edificio: location.edificio,
+                        salon: location.salon,
+                        startTime: location.horaEntrada,
+                        endTime: location.horaSalida,
+                        locationData: location,
+                        onTap: _onLocationCardTapped,
+                      );
+                    },
+                  ),
+                ),
           ],
         ),
       ),
 
-      bottomNavigationBar: const BottomBarNavigationProfessor()
+      bottomNavigationBar: const BottomBarNavigationProfessor(),
     );
   }
 }
-
-

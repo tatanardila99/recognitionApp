@@ -10,7 +10,6 @@ import 'contact_us_screen.dart';
 import 'update_user_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-
   final UserRole userRole;
   final Widget? customBottomNavigationBar;
 
@@ -51,44 +50,62 @@ class _ProfileScreen extends State<ProfileScreen> {
 
             Center(
               child: Text(
-                currentUser!.name as String,
+                currentUser!.name,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 50),
 
-            ProfileOption(title: 'Mi perfil', onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const UpdateUserScreen())
-              );
-            }),
+            ProfileOption(
+              title: 'Mi perfil',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UpdateUserScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 16),
-            ProfileOption(title: 'Cambiar clave', onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
-              );
-            }),
+            ProfileOption(
+              title: 'Cambiar clave',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ChangePasswordScreen(),
+                  ),
+                );
+              },
+            ),
 
             const SizedBox(height: 16),
-            ProfileOption(title: 'Notificacion', onTap: () {
-
-            }),
+            ProfileOption(title: 'Notificacion', onTap: () {}),
             const SizedBox(height: 16),
-            ProfileOption(title: 'Acerda de', onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutUsScreen()),
-              );
-            }),
+            ProfileOption(
+              title: 'Acerda de',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutUsScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 16),
-            ProfileOption(title: 'Contactenos', onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ContactUsScreen()),
-              );
-            }),
+            ProfileOption(
+              title: 'Contactenos',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactUsScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 60),
 
             Center(
@@ -99,8 +116,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/',
-                    (Route<dynamic> route) =>
-                        false,
+                    (Route<dynamic> route) => false,
                   );
                 },
                 style: ElevatedButton.styleFrom(

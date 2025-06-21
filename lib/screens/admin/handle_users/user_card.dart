@@ -2,20 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/models/user_data.dart';
 import 'package:uts_recognitionapp/screens/admin/handle_users/user_details.dart';
 
-
 class UserCard extends StatelessWidget {
   final UserData user;
   final VoidCallback? onUserUpdated;
-  const UserCard({Key? key, required this.user, this.onUserUpdated}) : super(key: key);
+  const UserCard({super.key, required this.user, this.onUserUpdated});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -38,15 +35,24 @@ class UserCard extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Color(0xFF899DD9),
-                backgroundImage: user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty
-                    ? NetworkImage(user.profileImageUrl!)
-                    : null,
-                child: user.profileImageUrl == null || user.profileImageUrl!.isEmpty
-                    ? Text(
-                  user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                  style: const TextStyle(color: Colors.white, fontSize: 24),
-                )
-                    : null,
+                backgroundImage:
+                    user.profileImageUrl != null &&
+                            user.profileImageUrl!.isNotEmpty
+                        ? NetworkImage(user.profileImageUrl!)
+                        : null,
+                child:
+                    user.profileImageUrl == null ||
+                            user.profileImageUrl!.isEmpty
+                        ? Text(
+                          user.name.isNotEmpty
+                              ? user.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                          ),
+                        )
+                        : null,
               ),
               const SizedBox(width: 16.0),
               Expanded(
@@ -66,20 +72,14 @@ class UserCard extends StatelessWidget {
                     const SizedBox(height: 4.0),
                     Text(
                       user.email,
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey[600]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4.0),
                     Text(
                       'Rol: ${user.rol}',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.grey[700],
-                      ),
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
                     ),
                     if (user.status == 0)
                       Padding(

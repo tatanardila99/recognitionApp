@@ -3,16 +3,13 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart'; // Import Provider
 import 'package:flutter/material.dart'; // For BuildContext
 
-import 'package:uts_recognitionapp/models/user_data.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 
-
-
 class AuthService {
-  final String _authBaseUrl = 'http://192.168.1.6:3000/api'; // Your API base URL
+  final String _authBaseUrl =
+      'http://192.168.1.6:3000/api'; // Your API base URL
 
   String? _authToken;
-
 
   AuthService._privateConstructor();
   static final AuthService _instance = AuthService._privateConstructor();
@@ -29,7 +26,11 @@ class AuthService {
 
   } */
 
-  Future<Map<String, dynamic>> login(BuildContext context, String email, String password) async {
+  Future<Map<String, dynamic>> login(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     final Uri uri = Uri.parse('$_authBaseUrl/access-list');
 
     try {
@@ -50,31 +51,46 @@ class AuthService {
         if (responseData['token'] != null && responseData['user'] != null) {
           _authToken = responseData['token'] as String;
 
-          Provider.of<UserProvider>(context, listen: false).setUser(responseData['user'] as Map<String, dynamic>);
+          Provider.of<UserProvider>(
+            context,
+            listen: false,
+          ).setUser(responseData['user'] as Map<String, dynamic>);
 
           return {'success': true, 'message': 'Inicio de sesión exitoso.'};
         } else {
           logout(context);
-          return {'success': false, 'message': 'Respuesta de inicio de sesión incompleta (falta token o datos de usuario).'};
+          return {
+            'success': false,
+            'message':
+                'Respuesta de inicio de sesión incompleta (falta token o datos de usuario).',
+          };
         }
       } else if (response.statusCode == 401) {
         logout(context);
-        return {'success': false, 'message': responseData['message'] ?? 'Credenciales inválidas.'};
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Credenciales inválidas.',
+        };
       } else {
         logout(context); // Clear state on unexpected error
-        return {'success': false, 'message': responseData['message'] ?? 'Error desconocido al iniciar sesión.'};
+        return {
+          'success': false,
+          'message':
+              responseData['message'] ?? 'Error desconocido al iniciar sesión.',
+        };
       }
     } catch (e) {
       logout(context);
-      return {'success': false, 'message': 'Error de conexión durante el inicio de sesión: $e'};
+      return {
+        'success': false,
+        'message': 'Error de conexión durante el inicio de sesión: $e',
+      };
     }
   }
-
 
   void logout(BuildContext context) {
     _authToken = null;
 
     Provider.of<UserProvider>(context, listen: false).clearUser();
   }
-
 }

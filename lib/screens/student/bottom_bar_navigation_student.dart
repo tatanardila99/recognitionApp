@@ -8,11 +8,11 @@ class BottomBarNavigationStudent extends StatefulWidget {
   const BottomBarNavigationStudent({super.key});
 
   @override
-  State<BottomBarNavigationStudent> createState() => _BottomBarNavigationStudent();
+  State<BottomBarNavigationStudent> createState() =>
+      _BottomBarNavigationStudent();
 }
 
 class _BottomBarNavigationStudent extends State<BottomBarNavigationStudent> {
-
   int _selectedIndex = 0;
 
   void _onTappedItem(int index) {
@@ -21,21 +21,25 @@ class _BottomBarNavigationStudent extends State<BottomBarNavigationStudent> {
     });
     if (index == 0) {
       Navigator.push(
-          context,
-          MaterialPageRoute(builder: (contex) => const StudentHomeScreen())
+        context,
+        MaterialPageRoute(builder: (contex) => const StudentHomeScreen()),
       );
     } else if (index == 1) {
       Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen(userRole: UserRole.student, customBottomNavigationBar: const BottomBarNavigationStudent()))
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => const ProfileScreen(
+                userRole: UserRole.student,
+                customBottomNavigationBar: BottomBarNavigationStudent(),
+              ),
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: ''),

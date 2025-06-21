@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../models/location.dart';
 
@@ -20,18 +19,15 @@ class LocationDisplayCard extends StatelessWidget {
     required this.startTime,
     required this.endTime,
     required this.locationData,
-    required this.onTap
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: InkWell(
         onTap: () => onTap(locationData),
         child: IntrinsicHeight(
@@ -55,7 +51,6 @@ class LocationDisplayCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-
                       Text(
                         '$locationName - ${edificio.toUpperCase()}$salon',
                         style: const TextStyle(
@@ -83,9 +78,7 @@ class LocationDisplayCard extends StatelessWidget {
             ],
           ),
         ),
-      )
-
+      ),
     );
   }
 }
-

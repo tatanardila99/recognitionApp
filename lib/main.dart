@@ -4,7 +4,6 @@ import 'package:uts_recognitionapp/screens/admin/home_admin.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
 import 'package:uts_recognitionapp/screens/student/home_student.dart';
-import 'package:uts_recognitionapp/screens/common/profile_screen.dart';
 import 'package:uts_recognitionapp/screens/teacher/home_professor.dart';
 import 'screens/face_id_intro_screen.dart';
 import 'screens/face_id_scanning_screen.dart';
@@ -39,11 +38,11 @@ class MyApp extends StatelessWidget {
         '/': (context) => const FaceIdIntroScreen(),
         '/sign': (context) => const LoginPage(),
         '/sign_up': (context) => const FaceIdSignUp(),
-        '/scan': (context) => const FaceIdScanningScreen(),
+        //'/scan': (context) => const FaceIdScanningScreen(),
         '/success': (context) => const FaceIdSuccessScreen(),
         '/student/home': (context) => const StudentHomeScreen(),
         '/professor/home': (context) => const HomeProfessor(),
-        '/admin/home': (context) => const AdminHomeScreen()
+        '/admin/home': (context) => const AdminHomeScreen(),
       },
     );
   }

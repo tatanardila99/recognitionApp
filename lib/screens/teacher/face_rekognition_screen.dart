@@ -14,7 +14,6 @@ class FaceCameraScreen extends StatefulWidget {
 }
 
 class _FaceCameraScreenState extends State<FaceCameraScreen> {
-
   bool _isSending = false;
 
   final BackendService _backendService = BackendService();
@@ -47,18 +46,15 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
         if (image != null && mounted) {
           _sendImageToServer(image);
         } else if (image == null && mounted) {
-          print('Error en onCapture: La imagen capturada es null.');
           showToastMessage(
-              context: context,
-              message: 'No se pudo capturar la imagen. Intenta de nuevo.',
-              isError: true);
-
+            context: context,
+            message: 'No se pudo capturar la imagen. Intenta de nuevo.',
+            isError: true,
+          );
         }
-
       },
     );
   }
-
 
   Future<void> _sendImageToServer(File image) async {
     if (!mounted || _isSending) return;
@@ -74,10 +70,23 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
       );
 
       if (res != null) {
-        Map<String, dynamic>? location = await _backendService.getLocationBYId(context, widget.locationId);
-        showSuccessDialog(context: context, userName: res['username'], confidence: res['similarity'], locationName: location?['location_name'], onOkPressed: () => {print("ok")});
+        Map<String, dynamic>? location = await _backendService.getLocationBYId(
+          context,
+          widget.locationId,
+        );
+        showSuccessDialog(
+          context: context,
+          userName: res['username'],
+          confidence: res['similarity'],
+          locationName: location?['location_name'],
+          onOkPressed: () => {print("ok")},
+        );
       } else {
-        showToastMessage(context: context, message: "El usuario no se encuentra registrado", isError: true);
+        showToastMessage(
+          context: context,
+          message: "El usuario no se encuentra registrado",
+          isError: true,
+        );
       }
     } catch (e) {
       print('Error al validar el acceso: $e');
@@ -86,13 +95,9 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
         setState(() {
           _isSending = false;
         });
-
       }
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -110,10 +115,9 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
             showControls: true,
             showCameraLensControl: true,
             showCaptureControl: false,
-
           ),
 
-          if ( _isSending)
+          if (_isSending)
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
