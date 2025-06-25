@@ -10,6 +10,7 @@ import 'package:uts_recognitionapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import '../models/location.dart';
 import '../models/user_data.dart';
+import '../models/access_info.dart';
 
 class BackendService {
   //final String _baseUrl = 'http://10.0.2.2:3000/api'; // emulador
@@ -125,6 +126,8 @@ class BackendService {
         String? userName = data['user'];
         double? similarity = data['similarity'];
         return {'username': userName, 'similarity': similarity};
+      } else if (response.statusCode == 203) {
+        return {'username': 'Desconocido', 'similarity': '0.0'};
       } else {
         final responseBody = await response.stream.bytesToString();
         return null;
@@ -313,7 +316,6 @@ class BackendService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print("responseBody ======> ${responseBody}");
         List<dynamic> jsonList =
             responseBody['locations'] as List<dynamic>? ?? [];
         return jsonList.map((json) => Location.fromJson(json)).toList();
@@ -323,6 +325,50 @@ class BackendService {
         return [];
       } else {
         final errorBody = json.decode(response.body);
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<AccessEntry>> getAllAccess(BuildContext context) async {
+    final Uri uri = Uri.parse('$_baseUrl/access-list');
+
+    try {
+      final response = await _httpClient.get(uri, headers: _getAuthHeaders());
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        print(responseBody);
+        List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
+        return jsonList.map((json) => AccessEntry.fromJson(json)).toList();
+      } else if (response.statusCode == 400) {
+        _handleUnauthorized(context);
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<AccessEntry>> getAccessById(BuildContext context) async {
+    final Uri uri = Uri.parse('$_baseUrl/access-user');
+
+    try {
+      final response = await _httpClient.get(uri, headers: _getAuthHeaders());
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        print(responseBody);
+        List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
+        return jsonList.map((json) => AccessEntry.fromJson(json)).toList();
+      } else if (response.statusCode == 400) {
+        _handleUnauthorized(context);
+        return [];
+      } else {
         return [];
       }
     } catch (e) {

@@ -1,17 +1,30 @@
 class AccessEntry {
+  final String? userName;
   final String? locationName;
   final String? dateEntry;
-  final String? result;
+  final String result;
   final double? confidence;
 
-  AccessEntry({this.locationName, this.dateEntry, this.result, this.confidence});
+  AccessEntry({
+    this.userName,
+    this.locationName,
+    required this.dateEntry,
+    required this.result,
+    this.confidence,
+  });
 
   factory AccessEntry.fromJson(Map<String, dynamic> json) {
     return AccessEntry(
-      locationName: json['location_name'],
+      userName: json['user_name'] as String?,
+      locationName: json['location_name'] as String?,
       dateEntry: json['date_entry'],
       result: json['result'],
-      confidence: double.tryParse(json['confidence'].toString()),
+      confidence: json['confidence'] != null ? (json['confidence'] as num).toDouble() : null,
     );
+  }
+
+  @override
+  String toString() {
+    return 'AccessEntry( userName: $userName, locationName: $locationName, dateEntry: $dateEntry, result: $result, confidence: $confidence)';
   }
 }

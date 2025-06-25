@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/user_data.dart';
-import '../../models/user_role.dart';
 import '../../providers/user_provider.dart';
 import 'about_us_screen.dart';
 import 'change_password_screen.dart';
@@ -10,14 +8,9 @@ import 'contact_us_screen.dart';
 import 'update_user_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final UserRole userRole;
   final Widget? customBottomNavigationBar;
 
-  const ProfileScreen({
-    super.key,
-    required this.userRole,
-    this.customBottomNavigationBar,
-  });
+  const ProfileScreen({super.key, this.customBottomNavigationBar});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreen();

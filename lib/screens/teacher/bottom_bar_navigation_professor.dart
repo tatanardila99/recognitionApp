@@ -9,43 +9,48 @@ class BottomBarNavigationProfessor extends StatefulWidget {
   const BottomBarNavigationProfessor({super.key});
 
   @override
-  State<BottomBarNavigationProfessor> createState() => _BottomBarNavigationProfessor();
+  State<BottomBarNavigationProfessor> createState() =>
+      _BottomBarNavigationProfessor();
 }
 
-class _BottomBarNavigationProfessor extends State<BottomBarNavigationProfessor> {
-
+class _BottomBarNavigationProfessor
+    extends State<BottomBarNavigationProfessor> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       if (index == 0) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeProfessor()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeProfessor()),
+        );
       } else if (index == 1) {
         _addLocation(context);
       } else if (index == 2) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProfileScreen(userRole: UserRole.teacher, customBottomNavigationBar: const BottomBarNavigationProfessor())),
+          MaterialPageRoute(
+            builder:
+                (context) => ProfileScreen(
+                  customBottomNavigationBar:
+                      const BottomBarNavigationProfessor(),
+                ),
+          ),
         );
       }
     });
   }
-
 
   void _addLocation(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => AddLocationScreen()),
     );
-
   }
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(

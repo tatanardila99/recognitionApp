@@ -1,4 +1,3 @@
-// student_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation_student.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 import 'package:uts_recognitionapp/models/user_data.dart';
 import 'package:uts_recognitionapp/models/access_info.dart';
+import 'package:uts_recognitionapp/services/service.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -15,38 +15,28 @@ class StudentHomeScreen extends StatefulWidget {
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
+  final BackendService _backendService = BackendService();
+  Future<List<AccessEntry>>? _accessHistoryFuture;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-
-    final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-      List<dynamic>? accessInfoRaw = args['accessInfo'];
-      Map<String, dynamic>? userDataRaw = args['userData'];
-
-      if (userDataRaw != null) {
-        userProvider.setUser(userDataRaw);
-      }
-      if (accessInfoRaw != null) {
-        userProvider.setAccessInfo(accessInfoRaw);
-      }
-      print('Datos guardados en el Provider.');
-    }
+  void initState() {
+    super.initState();
+    _fetchAccessHistory();
   }
 
+  Future<void> _fetchAccessHistory() async {
+    setState(() {
+      _accessHistoryFuture = _backendService.getAccessById(context);
+    });
+  }
 
-  String _formatDate(String dateString) {
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return 'N/A';
     try {
       final dateTime = DateTime.parse(dateString);
       return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
     } catch (e) {
-      print('Error al formatear fecha: $e');
+      print('Error al formatear fecha "$dateString": $e');
       return dateString;
     }
   }
@@ -55,8 +45,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final UserData? currentUser = userProvider.currentUser;
-    final List<AccessEntry>? currentAccessInfo = userProvider.currentAccessInfo;
-
 
     return Scaffold(
       body: Column(
@@ -109,31 +97,72 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
 
           Expanded(
-            child: currentAccessInfo == null || currentAccessInfo.isEmpty
-                ? const Center(child: Text('No hay registros de acceso disponibles.'))
-                : SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const <DataColumn>[
-                    DataColumn(label: Text('Ubicación')),
-                    DataColumn(label: Text('Fecha y Hora')),
-                    DataColumn(label: Text('Resultado')),
-                    DataColumn(label: Text('Confianza')),
-                  ],
-                  rows: currentAccessInfo.map<DataRow>((access) {
-                    return DataRow(
-                      cells: <DataCell>[
-                        DataCell(Text(access.locationName ?? '')),
-                        DataCell(Text(_formatDate(access.dateEntry ?? ''))),
-                        DataCell(Text(access.result ?? '')),
-                        DataCell(Text('${access.confidence?.toStringAsFixed(2) ?? 'N/A'}%')),
+            child: FutureBuilder<List<AccessEntry>>(
+              future: _accessHistoryFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  print('ERROR FutureBuilder: ${snapshot.error}');
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 40,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Error al cargar el historial: ${snapshot.error}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                        ElevatedButton(
+                          onPressed: _fetchAccessHistory,
+                          child: const Text('Reintentar'),
+                        ),
                       ],
-                    );
-                  }).toList(),
-                ),
-              ),
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text('No hay registros de acceso disponibles.'),
+                  );
+                } else {
+                  final List<AccessEntry> accessHistory = snapshot.data!;
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: const <DataColumn>[
+                          DataColumn(label: Text('Ubicación')),
+                          DataColumn(label: Text('Fecha y Hora')),
+                          DataColumn(label: Text('Resultado')),
+                          DataColumn(label: Text('Confianza')),
+                        ],
+                        rows:
+                            accessHistory.map<DataRow>((access) {
+                              return DataRow(
+                                cells: <DataCell>[
+                                  DataCell(Text(access.locationName ?? 'N/A')),
+                                  DataCell(Text(_formatDate(access.dateEntry))),
+                                  DataCell(Text(access.result ?? 'N/A')),
+                                  DataCell(
+                                    Text(
+                                      '${access.confidence?.toStringAsFixed(2) ?? 'N/A'}%',
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ],

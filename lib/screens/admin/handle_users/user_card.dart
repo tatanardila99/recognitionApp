@@ -31,7 +31,6 @@ class UserCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: <Widget>[
-              // User profile picture or initial
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Color(0xFF899DD9),

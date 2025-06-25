@@ -16,8 +16,6 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-
-  final BackendService _backendService = BackendService();
   bool _isLoading = false;
 
   void _showMessage(String message, {bool isError = false}) {
@@ -191,8 +189,15 @@ class _LoginPageState extends State<LoginPage> {
                                       if (result['success'] == true) {
                                         _showMessage(result['message']);
 
-                                        final userProvider = Provider.of<UserProvider>(context, listen: false);
-                                        final String? userRole = userProvider.currentUser?.rol;
+                                        //AuthService().setAuthToken(token);
+
+                                        final userProvider =
+                                            Provider.of<UserProvider>(
+                                              context,
+                                              listen: false,
+                                            );
+                                        final String? userRole =
+                                            userProvider.currentUser?.rol;
                                         print('rol ==> $userRole');
                                         switch (userRole) {
                                           case 'estudiante':
@@ -212,7 +217,10 @@ class _LoginPageState extends State<LoginPage> {
                                             );
                                         }
                                       } else {
-                                        _showMessage(result['message'], isError: true);
+                                        _showMessage(
+                                          result['message'],
+                                          isError: true,
+                                        );
                                       }
                                     } catch (e) {
                                       _showMessage(

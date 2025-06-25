@@ -16,7 +16,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
 
-  final BackendService _backendService = BackendService();
   bool _isLoading = false;
   String? _formMessage;
 

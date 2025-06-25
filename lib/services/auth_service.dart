@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart'; // Import Provider
-import 'package:flutter/material.dart'; // For BuildContext
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 
 class AuthService {
-  final String _authBaseUrl =
-      'http://192.168.1.6:3000/api'; // Your API base URL
+  final String _authBaseUrl = 'http://192.168.1.6:3000/api';
 
   String? _authToken;
 
@@ -18,20 +18,27 @@ class AuthService {
     return _instance;
   }
 
-  String? get authToken => _authToken;
+  String? get authToken {
+    return _authToken;
+  }
   bool get isAuthenticated => _authToken != null;
 
-  /*
-  Future<void> initializeAuth(BuildContext context) async {
+  Future<void> _saveAuthToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
 
-  } */
+  Future<void> loadAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _authToken = prefs.getString('auth_token');
+  }
 
   Future<Map<String, dynamic>> login(
     BuildContext context,
     String email,
     String password,
   ) async {
-    final Uri uri = Uri.parse('$_authBaseUrl/access-list');
+    final Uri uri = Uri.parse('$_authBaseUrl/sign-in');
 
     try {
       final response = await http.post(
@@ -50,6 +57,7 @@ class AuthService {
       if (response.statusCode == 200) {
         if (responseData['token'] != null && responseData['user'] != null) {
           _authToken = responseData['token'] as String;
+          await _saveAuthToken(_authToken!);
 
           Provider.of<UserProvider>(
             context,
@@ -88,9 +96,10 @@ class AuthService {
     }
   }
 
-  void logout(BuildContext context) {
+  void logout(BuildContext context) async {
     _authToken = null;
-
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
     Provider.of<UserProvider>(context, listen: false).clearUser();
   }
 }

@@ -5,6 +5,7 @@ import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/face_id_sign_up.dart';
 import 'package:uts_recognitionapp/screens/student/home_student.dart';
 import 'package:uts_recognitionapp/screens/teacher/home_professor.dart';
+import 'package:uts_recognitionapp/services/auth_service.dart';
 import 'screens/face_id_intro_screen.dart';
 import 'screens/face_id_scanning_screen.dart';
 import 'screens/face_id_success_screen.dart';
@@ -17,6 +18,7 @@ void main() async {
 
   await FaceCamera.initialize();
   await initializeDateFormatting('es_ES', null);
+  await AuthService().loadAuthToken();
 
   runApp(
     ChangeNotifierProvider(

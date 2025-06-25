@@ -7,8 +7,6 @@ import '../../providers/user_provider.dart';
 import '../common/profile_screen.dart';
 import 'handle_locations/all_locations.dart';
 
-
-
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
 
@@ -17,16 +15,15 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreen extends State<AdminHomeScreen> {
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
-
+    if (args != null &&
+        !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
 
@@ -39,7 +36,6 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
         if (accessInfoRaw != null) {
           userProvider.setAccessInfo(accessInfoRaw);
         }
-
       });
     }
   }
@@ -92,16 +88,20 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
             ),
             Text(
               'Administrador',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.grey[700],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: Colors.grey[700]),
             ),
           ],
         ),
         Stack(
           children: [
             IconButton(
-              icon: const Icon(Icons.notifications_none, size: 30, color: Colors.black54),
+              icon: const Icon(
+                Icons.notifications_none,
+                size: 30,
+                color: Colors.black54,
+              ),
               onPressed: () {
                 print('Notificaciones');
               },
@@ -115,20 +115,14 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                constraints: const BoxConstraints(
-                  minWidth: 12,
-                  minHeight: 12,
-                ),
+                constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
                 child: const Text(
                   '0',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 8),
                   textAlign: TextAlign.center,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -141,10 +135,7 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF86D3FF),
-            Color(0xFF0075FF),
-          ],
+          colors: [Color(0xFF86D3FF), Color(0xFF0075FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -166,10 +157,7 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Accede con mayor seguridad.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ],
             ),
@@ -177,12 +165,8 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
           const SizedBox(width: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
-            child: Image.asset(
-              'assets/shield.jpg',
-              height: 80,
-            ),
-          )
-
+            child: Image.asset('assets/shield.jpg', height: 80),
+          ),
         ],
       ),
     );
@@ -196,42 +180,72 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
       crossAxisSpacing: 1,
       mainAxisSpacing: 10,
       children: [
-        _buildFeatureCard(context, 'Usuarios', "assets/users-image.png", Color(0xFF54787D), () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => UserManagementScreen()));
-        }),
-        _buildFeatureCard(context, 'Ubicaciones', "assets/location-image.png", Color(0xFFF39C12), () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => LocationsScreen()));
-        }),
-        _buildFeatureCard(context, 'Responssables', "assets/responsibles-image.png", Color(0xFFFD6084), () {
-
-
-        }),
-        _buildFeatureCard(context, 'Horarios', "assets/schedules-image.png", Color(0xFF045071), () {
-
-   
-        }),
+        _buildFeatureCard(
+          context,
+          'Usuarios',
+          "assets/users-image.png",
+          Color(0xFF54787D),
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserManagementScreen()),
+            );
+          },
+        ),
+        _buildFeatureCard(
+          context,
+          'Ubicaciones',
+          "assets/location-image.png",
+          Color(0xFFF39C12),
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LocationsScreen()),
+            );
+          },
+        ),
+        _buildFeatureCard(
+          context,
+          'Responssables',
+          "assets/responsibles-image.png",
+          Color(0xFFFD6084),
+          () {},
+        ),
+        _buildFeatureCard(
+          context,
+          'Horarios',
+          "assets/schedules-image.png",
+          Color(0xFF045071),
+          () {},
+        ),
       ],
     );
   }
 
-  Widget _buildFeatureCard(BuildContext context, String title, String imagePath, Color bgColor, VoidCallback onTap) {
+  Widget _buildFeatureCard(
+    BuildContext context,
+    String title,
+    String imagePath,
+    Color bgColor,
+    VoidCallback onTap,
+  ) {
     return Column(
       children: [
         Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        color: bgColor.withOpacity(0.8),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-              padding: const EdgeInsets.all(22.0),
-              child: Image.asset(imagePath, height: 60,width: 60)
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-        )
-    ),
+          color: bgColor.withOpacity(0.8),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(22.0),
+              child: Image.asset(imagePath, height: 60, width: 60),
+            ),
+          ),
+        ),
         Text(
           title,
           textAlign: TextAlign.center,
@@ -242,8 +256,6 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
         ),
       ],
     );
-
-
   }
 
   Widget _buildBottomNavBar(BuildContext context) {
@@ -255,15 +267,16 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
         children: <Widget>[
           IconButton(
             icon: const Icon(Icons.apps, color: Colors.blue),
-            onPressed: () {
-
-            },
+            onPressed: () {},
           ),
 
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(userRole: UserRole.admin,)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
             },
           ),
         ],

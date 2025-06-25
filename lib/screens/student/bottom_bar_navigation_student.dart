@@ -30,7 +30,6 @@ class _BottomBarNavigationStudent extends State<BottomBarNavigationStudent> {
         MaterialPageRoute(
           builder:
               (context) => const ProfileScreen(
-                userRole: UserRole.student,
                 customBottomNavigationBar: BottomBarNavigationStudent(),
               ),
         ),
