@@ -1,26 +1,40 @@
 class AccessEntry {
-  final String? userName;
-  final String? locationName;
+  final String userName;
+  final String locationName;
   final String? dateEntry;
   final String result;
   final double? confidence;
 
   AccessEntry({
-    this.userName,
-    this.locationName,
+    required this.userName,
+    required this.locationName,
     required this.dateEntry,
     required this.result,
     this.confidence,
   });
 
   factory AccessEntry.fromJson(Map<String, dynamic> json) {
-    return AccessEntry(
-      userName: json['user_name'] as String?,
-      locationName: json['location_name'] as String?,
-      dateEntry: json['date_entry'],
-      result: json['result'],
-      confidence: json['confidence'] != null ? (json['confidence'] as num).toDouble() : null,
-    );
+    try {
+      double? parsedConfidence;
+      if (json['confidence'] != null) {
+        if (json['confidence'] is String) {
+          parsedConfidence = double.tryParse(json['confidence']);
+        } else if (json['confidence'] is num) {
+          parsedConfidence = (json['confidence'] as num).toDouble();
+        }
+      }
+
+      return AccessEntry(
+        userName: json['user_name']! as String,
+        locationName: json['location_name'] as String,
+        dateEntry: json['date_entry'],
+        result: json['result'],
+        confidence: parsedConfidence,
+      );
+    } catch (e) {
+      rethrow;
+    }
+
   }
 
   @override

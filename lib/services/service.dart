@@ -340,8 +340,9 @@ class BackendService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print(responseBody);
+        print('BackendService: getAllAccess - Decoded Response Body: $responseBody');
         List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
+        print('BackendService: getAllAccess - Number of access items found: ${jsonList.length}');
         return jsonList.map((json) => AccessEntry.fromJson(json)).toList();
       } else if (response.statusCode == 400) {
         _handleUnauthorized(context);

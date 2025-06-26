@@ -5,6 +5,7 @@ import 'package:uts_recognitionapp/screens/admin/handle_users/user_managment.dar
 
 import '../../providers/user_provider.dart';
 import '../common/profile_screen.dart';
+import 'access/access_list.dart';
 import 'handle_locations/all_locations.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -206,18 +207,17 @@ class _AdminHomeScreen extends State<AdminHomeScreen> {
         ),
         _buildFeatureCard(
           context,
-          'Responssables',
+          'Accesos',
           "assets/responsibles-image.png",
           Color(0xFFFD6084),
-          () {},
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminAccessListScreen()),
+            );
+          },
         ),
-        _buildFeatureCard(
-          context,
-          'Horarios',
-          "assets/schedules-image.png",
-          Color(0xFF045071),
-          () {},
-        ),
+
       ],
     );
   }

@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:face_camera/face_camera.dart';
+import 'package:uts_recognitionapp/screens/face_id_sign_in.dart';
 import 'package:uts_recognitionapp/screens/reviewPhotoPage.dart';
 import 'package:uts_recognitionapp/services/service.dart';
+import 'package:path/path.dart' as path;
 
 class FaceIdSignUp extends StatelessWidget {
   const FaceIdSignUp({super.key});
@@ -25,6 +27,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _documentController = TextEditingController();
   final BackendService _backendService = BackendService();
 
   String? _selectedRol;
@@ -43,7 +46,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
       defaultCameraLens: CameraLens.front,
       onCapture: (File? image) async {
         if (image != null) {
-          // Detener cámara y mostrar pantalla de revisión
+
           _cameraController?.stopImageStream();
 
           final confirm = await Navigator.push<bool>(
@@ -55,15 +58,33 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
             setState(() {
               _capturedFace = image;
               _isCameraActive = false;
-              _cameraMessage = 'Rostro capturado!';
+              _cameraMessage = 'Rostro capturado: ${path.basename(_capturedFace!.path)}';
             });
           } else {
-            // Volver a activar la cámara
-            _cameraController?.startImageStream();
+            setState(() {
+              _capturedFace = null;
+              _isCameraActive = false;
+              _cameraMessage = 'Toca para tomar una foto';
+            });
           }
+        } else {
+          setState(() {
+            _isCameraActive = false;
+            _cameraMessage = 'Error al capturar rostro. Toca para reintentar.';
+          });
         }
       },
-      onFaceDetected: (Face? face) {},
+      onFaceDetected: (Face? face) {
+        if (_isCameraActive) {
+          setState(() {
+            if (face == null) {
+              _cameraMessage = 'Centra tu rostro en el recuadro';
+            } else {
+              _cameraMessage = 'Rostro detectado!';
+            }
+          });
+        }
+      },
     );
   }
 
@@ -76,6 +97,7 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   void _startCamera() {
     setState(() {
       _isCameraActive = true;
+      _capturedFace = null;
     });
     if (_cameraController != null) {
       _cameraController!.startImageStream();
@@ -154,6 +176,29 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa tu email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 18),
+                  TextFormField(
+                    controller: _documentController,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20.0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFF6F6F6),
+                      labelText: 'Ingrese su numero de documento',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu documento de identidad';
                       }
                       return null;
                     },
@@ -265,19 +310,9 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     child: Text(
                       _cameraMessage,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  if (_capturedFace != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6.0),
-                      child: Image.file(
-                        _capturedFace!,
-                        width: 150,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
                   SizedBox(height: 40),
                   Column(
                     children: [
@@ -298,21 +333,22 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                             final String name = _nameController.text;
                             final String email = _emailController.text;
                             final String password = _passwordController.text;
+                            final String document = _documentController.text;
 
                             bool success = await _backendService
                                 .sendDataRegister(
                                   name,
                                   email,
                                   password,
-                                  "6434222225", // de momento esta quemado
+                                  document,
                                   _selectedRol!,
                                   _capturedFace,
                                 );
 
                             if (success) {
-                              print('Registro exitoso!');
+                              Navigator.push(context, (MaterialPageRoute(builder: (context) => const LoginPage())));
                             } else {
-                              print('Error al registrar');
+                              // show message
                             }
                           }
                         },
