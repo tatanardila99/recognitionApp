@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 
+import '../config/constants.dart';
+
 class AuthService {
-  final String _authBaseUrl = 'http://192.168.1.6:3000/api';
+  final String _authBaseUrl = kBaseUrl;
 
   String? _authToken;
 

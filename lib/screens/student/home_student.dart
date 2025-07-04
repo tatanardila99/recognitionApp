@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:uts_recognitionapp/models/user_access_entry.dart';
 import 'package:uts_recognitionapp/screens/student/bottom_bar_navigation_student.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 import 'package:uts_recognitionapp/models/user_data.dart';
-import 'package:uts_recognitionapp/models/access_info.dart';
+import 'package:uts_recognitionapp/models/admin_access_entry.dart';
 import 'package:uts_recognitionapp/services/service.dart';
 
 class StudentHomeScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class StudentHomeScreen extends StatefulWidget {
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
   final BackendService _backendService = BackendService();
-  Future<List<AccessEntry>>? _accessHistoryFuture;
+  Future<List<UserAccessEntry>>? _accessHistoryFuture;
 
   @override
   void initState() {
@@ -97,7 +98,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
 
           Expanded(
-            child: FutureBuilder<List<AccessEntry>>(
+            child: FutureBuilder<List<UserAccessEntry>>(
               future: _accessHistoryFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -131,7 +132,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                     child: Text('No hay registros de acceso disponibles.'),
                   );
                 } else {
-                  final List<AccessEntry> accessHistory = snapshot.data!;
+                  final List<UserAccessEntry> accessHistory = snapshot.data!;
                   return SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: SingleChildScrollView(

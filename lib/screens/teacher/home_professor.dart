@@ -86,9 +86,6 @@ class _HomeProfessor extends State<HomeProfessor> {
   }
 
   void _onLocationCardTapped(Location location) {
-    print('Tarjeta clickeada: ${location.name} (ID: ${location.id})');
-    print('Iniciando cámara facial para ${location.name}...');
-
     _startFaceCamera(context, location.id);
   }
 

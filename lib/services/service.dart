@@ -5,16 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:async/async.dart';
 import 'package:provider/provider.dart';
+import 'package:uts_recognitionapp/models/user_access_entry.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 import 'package:uts_recognitionapp/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import '../config/constants.dart';
 import '../models/location.dart';
 import '../models/user_data.dart';
-import '../models/access_info.dart';
+import '../models/admin_access_entry.dart';
 
 class BackendService {
-  //final String _baseUrl = 'http://10.0.2.2:3000/api'; // emulador
-  final String _baseUrl = 'http://192.168.1.6:3000/api'; // fisico
+
   final http.Client _httpClient = http.Client();
 
   BackendService._privateConstructor();
@@ -42,7 +43,7 @@ class BackendService {
     Map<String, dynamic> data,
   ) async {
     final response = await _httpClient.put(
-      Uri.parse('$_baseUrl/$endpoint'),
+      Uri.parse('$kBaseUrl/$endpoint'),
       headers: _getAuthHeaders(),
       body: json.encode(data),
     );
@@ -68,7 +69,7 @@ class BackendService {
     String rol,
     File? face,
   ) async {
-    final Uri uri = Uri.parse('$_baseUrl/register');
+    final Uri uri = Uri.parse('$kBaseUrl/register');
 
     try {
       final request = http.MultipartRequest('POST', uri);
@@ -108,7 +109,7 @@ class BackendService {
     File image,
     String locationId,
   ) async {
-    final Uri uri = Uri.parse('$_baseUrl/validate-access');
+    final Uri uri = Uri.parse(ApiEndpoints.validateFace);
 
     try {
       var request = http.MultipartRequest('POST', uri);
@@ -141,7 +142,7 @@ class BackendService {
     BuildContext context,
     Map<String, dynamic> locationData,
   ) async {
-    final Uri uri = Uri.parse('$_baseUrl/create-location');
+    final Uri uri = Uri.parse(ApiEndpoints.addLocation);
 
     try {
       final response = await http.post(
@@ -165,7 +166,7 @@ class BackendService {
   }
 
   Future<List<Location>> getLocations(BuildContext context) async {
-    final Uri uri = Uri.parse('$_baseUrl/all-locations');
+    final Uri uri = Uri.parse(ApiEndpoints.locations);
     try {
       final response = await http.get(uri, headers: _getAuthHeaders());
       if (response.statusCode == 200) {
@@ -188,7 +189,7 @@ class BackendService {
     BuildContext context,
     int id,
   ) async {
-    final Uri uri = Uri.parse('$_baseUrl/get-location-by-id/$id');
+    final Uri uri = Uri.parse('${ApiEndpoints.locationById}/$id');
 
     try {
       final response = await http.get(uri, headers: _getAuthHeaders());
@@ -213,7 +214,7 @@ class BackendService {
     int userId,
     Map<String, dynamic> updateData,
   ) async {
-    final Uri uri = Uri.parse('$_baseUrl/update-user/$userId');
+    final Uri uri = Uri.parse(ApiEndpoints.updateUser);
 
     try {
       final response = await _httpClient.put(
@@ -266,7 +267,7 @@ class BackendService {
   }
 
   Future<List<UserData>> getAllUsers(BuildContext context) async {
-    final Uri uri = Uri.parse('$_baseUrl/users');
+    final Uri uri = Uri.parse(ApiEndpoints.users);
     try {
       final response = await _httpClient.get(uri, headers: _getAuthHeaders());
 
@@ -286,8 +287,8 @@ class BackendService {
     }
   }
 
-  Future<bool> deleteUser(BuildContext context, int userId) async {
-    final Uri uri = Uri.parse('$_baseUrl/delete-user/$userId');
+  Future<bool> deleteUser(BuildContext context) async {
+    final Uri uri = Uri.parse(ApiEndpoints.deleteUser);
 
     try {
       final response = await _httpClient.delete(
@@ -309,7 +310,7 @@ class BackendService {
   }
 
   Future<List<Location>> getLocationsByResponsible(BuildContext context) async {
-    final Uri uri = Uri.parse('$_baseUrl/my-locations');
+    final Uri uri = Uri.parse(ApiEndpoints.myLocations);
 
     try {
       final response = await _httpClient.get(uri, headers: _getAuthHeaders());
@@ -332,8 +333,8 @@ class BackendService {
     }
   }
 
-  Future<List<AccessEntry>> getAllAccess(BuildContext context) async {
-    final Uri uri = Uri.parse('$_baseUrl/access-list');
+  Future<List<AdminAccessEntry>> getAllAccess(BuildContext context) async {
+    final Uri uri = Uri.parse(ApiEndpoints.access);
 
     try {
       final response = await _httpClient.get(uri, headers: _getAuthHeaders());
@@ -343,7 +344,7 @@ class BackendService {
         print('BackendService: getAllAccess - Decoded Response Body: $responseBody');
         List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
         print('BackendService: getAllAccess - Number of access items found: ${jsonList.length}');
-        return jsonList.map((json) => AccessEntry.fromJson(json)).toList();
+        return jsonList.map((json) => AdminAccessEntry.fromJson(json)).toList();
       } else if (response.statusCode == 400) {
         _handleUnauthorized(context);
         return [];
@@ -355,8 +356,8 @@ class BackendService {
     }
   }
 
-  Future<List<AccessEntry>> getAccessById(BuildContext context) async {
-    final Uri uri = Uri.parse('$_baseUrl/access-user');
+  Future<List<UserAccessEntry>> getAccessById(BuildContext context) async {
+    final Uri uri = Uri.parse(ApiEndpoints.myAccess);
 
     try {
       final response = await _httpClient.get(uri, headers: _getAuthHeaders());
@@ -365,7 +366,7 @@ class BackendService {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         print(responseBody);
         List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
-        return jsonList.map((json) => AccessEntry.fromJson(json)).toList();
+        return jsonList.map((json) => UserAccessEntry.fromJson(json)).toList();
       } else if (response.statusCode == 400) {
         _handleUnauthorized(context);
         return [];

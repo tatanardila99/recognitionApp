@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
+import 'dart:math';
 import '../../models/location.dart';
 
 class LocationDisplayCard extends StatelessWidget {
@@ -10,8 +11,16 @@ class LocationDisplayCard extends StatelessWidget {
   final String endTime;
   final Location locationData;
   final Function(Location location) onTap;
+  final Color cardColor;
 
-  const LocationDisplayCard({
+  static final List<Color> _cardColors = [
+    Colors.blue.shade900!,
+    Colors.lightBlue.shade400!,
+    Colors.pinkAccent.shade100!,
+    Colors.cyan.shade400!,
+  ];
+
+  LocationDisplayCard({
     super.key,
     required this.locationName,
     required this.edificio,
@@ -20,62 +29,111 @@ class LocationDisplayCard extends StatelessWidget {
     required this.endTime,
     required this.locationData,
     required this.onTap,
-  });
+    Color? cardColor,
+  }) : cardColor = cardColor ?? _cardColors[Random().nextInt(_cardColors.length)];
+
+  String _formatTime(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat('HH:mm EEEE, d MMMM', 'es_ES').format(dateTime);
+    } on FormatException {
+      final parts = dateString.split(':');
+      if (parts.length == 2 && int.tryParse(parts[0]) != null && int.tryParse(parts[1]) != null) {
+        final now = DateTime.now();
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        final dateTimeWithCurrentDate = DateTime(now.year, now.month, now.day, hour, minute);
+        return DateFormat('HH:mm EEEE, d MMMM', 'es_ES').format(dateTimeWithCurrentDate);
+      }
+      return "Fecha inválida";
+    } catch (e) {
+      return "Error de formato";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () => onTap(locationData),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Container(
-                width: 15.0,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2C3E50),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12.0),
-                    bottomLeft: Radius.circular(12.0),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+
+          padding: const EdgeInsets.fromLTRB(8.0, 12.0, 12.0, 12.0),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 6,
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ),
 
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                const SizedBox(width: 15),
+
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
-                        '$locationName - ${edificio.toUpperCase()}$salon',
+                        locationName,
                         style: const TextStyle(
-                          fontSize: 16.0,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        "ClassRoom Register",
+                        style: TextStyle(
                           color: Colors.black87,
+                          fontSize: 13,
                         ),
                       ),
-                      const SizedBox(height: 4.0),
-
-                      const SizedBox(height: 8.0),
+                      const SizedBox(height: 1),
+                      Text(
+                        _formatTime(startTime),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 1),
 
                       Text(
-                        '$startTime - $endTime',
+                        'Edificio: $edificio, Salón: $salon',
                         style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: Colors.grey,
+                          fontSize: 12,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

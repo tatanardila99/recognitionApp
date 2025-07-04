@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uts_recognitionapp/services/service.dart';
 import 'package:intl/intl.dart';
 
-import '../../../models/access_info.dart';
+import '../../../models/admin_access_entry.dart';
 
 class AdminAccessListScreen extends StatefulWidget {
   const AdminAccessListScreen({super.key});
@@ -12,7 +12,7 @@ class AdminAccessListScreen extends StatefulWidget {
 }
 
 class _AdminAccessListScreenState extends State<AdminAccessListScreen> {
-  late Future<List<AccessEntry>> _accessListFuture;
+  late Future<List<AdminAccessEntry>> _accessListFuture;
   final BackendService _backendService = BackendService();
 
   @override
@@ -49,14 +49,14 @@ class _AdminAccessListScreenState extends State<AdminAccessListScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blueGrey[800],
+        backgroundColor: Color(0xFF899DD9),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 4,
       ),
       body: RefreshIndicator(
         onRefresh: _refreshAccessList,
         color: Colors.blueGrey[800],
-        child: FutureBuilder<List<AccessEntry>>(
+        child: FutureBuilder<List<AdminAccessEntry>>(
           future: _accessListFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

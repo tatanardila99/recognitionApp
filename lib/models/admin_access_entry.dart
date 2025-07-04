@@ -1,11 +1,11 @@
-class AccessEntry {
+class AdminAccessEntry {
   final String userName;
   final String locationName;
   final String? dateEntry;
   final String result;
   final double? confidence;
 
-  AccessEntry({
+  AdminAccessEntry({
     required this.userName,
     required this.locationName,
     required this.dateEntry,
@@ -13,7 +13,7 @@ class AccessEntry {
     this.confidence,
   });
 
-  factory AccessEntry.fromJson(Map<String, dynamic> json) {
+  factory AdminAccessEntry.fromJson(Map<String, dynamic> json) {
     try {
       double? parsedConfidence;
       if (json['confidence'] != null) {
@@ -24,7 +24,7 @@ class AccessEntry {
         }
       }
 
-      return AccessEntry(
+      return AdminAccessEntry(
         userName: json['user_name']! as String,
         locationName: json['location_name'] as String,
         dateEntry: json['date_entry'],
