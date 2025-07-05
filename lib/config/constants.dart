@@ -1,5 +1,5 @@
 
-const String kBaseUrl = 'http://192.168.1.6:3000/api';
+const String kBaseUrl = 'http://192.168.101.73:3006/api';
 
 
 const String kAppName = 'UTS Recognition App';

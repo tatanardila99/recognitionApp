@@ -16,79 +16,103 @@ void showSuccessDialog({
     barrierDismissible: false,
     builder: (BuildContext dialogContext) {
       return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        elevation: 0.0,
         backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-
-              Image.asset(
-                'assets/success_icon.png',
-                height: 80,
-                width: 80,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Verificación exitosa',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Usuario: $userName',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0, color: Colors.grey),
-              ),
-              Text(
-                'Similitud: ${confidence.toStringAsFixed(1)}%',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0, color: Colors.grey),
-              ),
-              Text(
-                'Ubicación: $locationName',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0, color: Colors.grey),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Color del botón de éxito
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/success_icon.png', // Asegúrate de que el ícono exista
+                  width: 64,
+                  height: 64,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Success',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    color: Colors.black87,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                 ),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(); // Cierra el diálogo
-                  onOkPressed(); // Ejecuta el callback que se pasa
-                },
-                child: const Text(
-                  'OK',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                const SizedBox(height: 16),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    children: [
+                      const TextSpan(
+                        text: 'User: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: userName),
+                      const TextSpan(text: '\n'),
+                      const TextSpan(
+                        text: 'Confidence: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: '${confidence.toStringAsFixed(1)}%'),
+                      const TextSpan(text: '\n'),
+                      const TextSpan(
+                        text: 'Location: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: locationName),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    onOkPressed();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8EE28A),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 14,
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     },
   );
-}
 
 
-void showToastMessage({
+  void showToastMessage({
   required BuildContext context,
   required String message,
   bool isError = true,
@@ -104,4 +128,8 @@ void showToastMessage({
     backgroundColor: isError ? Colors.redAccent : Colors.blueAccent,
     textStyle: const TextStyle(color: Colors.white),
   );
+
+  }
+
+  
 }

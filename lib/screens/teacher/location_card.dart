@@ -35,7 +35,7 @@ class LocationDisplayCard extends StatelessWidget {
   String _formatTime(String dateString) {
     try {
       final dateTime = DateTime.parse(dateString);
-      return DateFormat('HH:mm EEEE, d MMMM', 'es_ES').format(dateTime);
+      return DateFormat('HH:mm EEEE, dd MMMM yyyy', 'es_ES').format(dateTime);
     } on FormatException {
       final parts = dateString.split(':');
       if (parts.length == 2 && int.tryParse(parts[0]) != null && int.tryParse(parts[1]) != null) {
@@ -102,7 +102,7 @@ class LocationDisplayCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       const Text(
-                        "ClassRoom Register",
+                        "Ubicacion Registrada",
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 13,
