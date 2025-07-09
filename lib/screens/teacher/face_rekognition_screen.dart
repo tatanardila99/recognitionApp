@@ -25,23 +25,6 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
     _controller = FaceCameraController(
       autoCapture: true,
       defaultCameraLens: CameraLens.front,
-      /*onFaceDetected: (Face? face) async {
-
-        if (face != null) {
-
-          try {
-
-            await _controller.takePicture();
-          } catch (e) {
-            print('Error al intentar tomar la foto: $e');
-            showToastMessage(
-                context: context,
-                message: 'Error de cámara al tomar la foto.',
-                isError: true);
-
-          }
-        }
-      },*/
       onCapture: (File? image) async {
         if (image != null && mounted) {
           _sendImageToServer(image);
@@ -79,7 +62,9 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
           userName: res['username'],
           confidence: res['similarity'],
           locationName: location?['location_name'],
-          onOkPressed: () => {print("ok")},
+          onOkPressed: () => {
+            Navigator.pop(context),
+          },
         );
       } else {
         showToastMessage(

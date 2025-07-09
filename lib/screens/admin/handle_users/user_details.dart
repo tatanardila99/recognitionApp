@@ -169,7 +169,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     });
 
     try {
-      bool success = await _backendService.deleteUser(context);
+      bool success = await _backendService.deleteUser(context, _currentUser.id);
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(

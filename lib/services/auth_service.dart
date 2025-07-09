@@ -9,7 +9,6 @@ import 'package:uts_recognitionapp/providers/user_provider.dart';
 import '../config/constants.dart';
 
 class AuthService {
-  final String _authBaseUrl = kBaseUrl;
 
   String? _authToken;
 
@@ -40,7 +39,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    final Uri uri = Uri.parse('$_authBaseUrl/sign-in');
+    final Uri uri = Uri.parse(ApiEndpoints.login);
 
     try {
       final response = await http.post(

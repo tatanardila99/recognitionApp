@@ -15,7 +15,6 @@ import '../models/user_data.dart';
 import '../models/admin_access_entry.dart';
 
 class BackendService {
-
   final http.Client _httpClient = http.Client();
 
   BackendService._privateConstructor();
@@ -36,30 +35,7 @@ class BackendService {
   void _handleUnauthorized(BuildContext context) {
     AuthService().logout(context);
   }
-
-  Future<Map<String, dynamic>> _put(
-    BuildContext context,
-    String endpoint,
-    Map<String, dynamic> data,
-  ) async {
-    final response = await _httpClient.put(
-      Uri.parse('$kBaseUrl/$endpoint'),
-      headers: _getAuthHeaders(),
-      body: json.encode(data),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else if (response.statusCode == 401) {
-      _handleUnauthorized(context);
-      throw Exception('Unauthorized: Session expired or invalid token.');
-    } else {
-      final errorBody = json.decode(response.body);
-      throw Exception(
-        'Failed to update data: ${response.statusCode} - ${errorBody['message'] ?? response.body}',
-      );
-    }
-  }
+  
 
   Future<bool> sendDataRegister(
     String name,
@@ -252,15 +228,37 @@ class BackendService {
     String currentPassword,
     String newPassword,
   ) async {
-    final String endpoint = 'update-user/$userId';
+    final Uri uri = Uri.parse(ApiEndpoints.updateUser);
     final Map<String, dynamic> data = {
       'currentPassword': currentPassword,
       'password_hash': newPassword,
     };
 
     try {
-      final response = await _put(context, endpoint, data);
-      return response;
+      final response = await _httpClient.put(
+        uri,
+        headers: _getAuthHeaders(),
+        body: json.encode(data),
+      );
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (userId ==
+            Provider.of<UserProvider>(context, listen: false).currentUser?.id) {
+          Provider.of<UserProvider>(
+            context,
+            listen: false,
+          ).setUser(responseBody);
+        }
+        return responseBody;
+      } else if (response.statusCode == 401) {
+        _handleUnauthorized(context);
+        throw Exception('Unauthorized: Session expired or invalid token.');
+      } else {
+        final errorBody = json.decode(response.body);
+        throw Exception(
+          'Failed to update user: ${response.statusCode} - ${errorBody['message'] ?? response.body}',
+        );
+      }
     } catch (e) {
       rethrow;
     }
@@ -287,8 +285,8 @@ class BackendService {
     }
   }
 
-  Future<bool> deleteUser(BuildContext context) async {
-    final Uri uri = Uri.parse(ApiEndpoints.deleteUser);
+  Future<bool> deleteUser(BuildContext context, int id) async {
+    final Uri uri = Uri.parse("${ApiEndpoints.deleteUser}/$id");
 
     try {
       final response = await _httpClient.delete(
@@ -341,9 +339,13 @@ class BackendService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print('BackendService: getAllAccess - Decoded Response Body: $responseBody');
+        print(
+          'BackendService: getAllAccess - Decoded Response Body: $responseBody',
+        );
         List<dynamic> jsonList = responseBody['access'] as List<dynamic>? ?? [];
-        print('BackendService: getAllAccess - Number of access items found: ${jsonList.length}');
+        print(
+          'BackendService: getAllAccess - Number of access items found: ${jsonList.length}',
+        );
         return jsonList.map((json) => AdminAccessEntry.fromJson(json)).toList();
       } else if (response.statusCode == 400) {
         _handleUnauthorized(context);

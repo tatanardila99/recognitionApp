@@ -13,17 +13,39 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, this.customBottomNavigationBar});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreen();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreen extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final UserData? currentUser = userProvider.currentUser;
 
+    if (currentUser == null) {
+      return Scaffold(
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          title: const Text('Perfil'),
+          backgroundColor: Colors.grey[100],
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Cargando datos de usuario...'),
+            ],
+          ),
+        ),
+        bottomNavigationBar: widget.customBottomNavigationBar,
+      );
+    }
+
     String profileImagePath =
-        currentUser?.profileImageUrl ?? 'assets/profile_default.jpg';
+        currentUser.profileImageUrl ?? 'assets/profile_default.jpg';
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -43,7 +65,7 @@ class _ProfileScreen extends State<ProfileScreen> {
 
             Center(
               child: Text(
-                currentUser!.name,
+                currentUser.name,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
