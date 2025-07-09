@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
-
 void showSuccessDialog({
   required BuildContext context,
   required String userName,
@@ -38,7 +37,7 @@ void showSuccessDialog({
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  'assets/success_icon.png', // Asegúrate de que el ícono exista
+                  'assets/success_icon.png',
                   width: 64,
                   height: 64,
                 ),
@@ -110,9 +109,10 @@ void showSuccessDialog({
       );
     },
   );
+}
 
 
-  void showToastMessage({
+void showToastMessage({
   required BuildContext context,
   required String message,
   bool isError = true,
@@ -128,8 +128,4 @@ void showSuccessDialog({
     backgroundColor: isError ? Colors.redAccent : Colors.blueAccent,
     textStyle: const TextStyle(color: Colors.white),
   );
-
-  }
-
-  
 }
