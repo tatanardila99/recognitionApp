@@ -35,9 +35,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     if (dateString == null || dateString.isEmpty) return 'N/A';
     try {
       final dateTime = DateTime.parse(dateString);
-      return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+      return DateFormat('HH:mm EEEE, dd MMMM yyyy', 'es_ES').format(dateTime);
     } catch (e) {
-      print('Error al formatear fecha "$dateString": $e');
       return dateString;
     }
   }
@@ -48,8 +47,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     final UserData? currentUser = userProvider.currentUser;
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Container(
             width: double.infinity,
@@ -57,46 +56,42 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               top: MediaQuery.of(context).padding.top + 16.0,
               bottom: 16.0,
             ),
-            decoration: const BoxDecoration(color: Color(0xFF899DD9)),
-            height: 200,
+            decoration: const BoxDecoration(
+              color: Color(0xFF899DD9),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+            ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[300],
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: const AssetImage('assets/profile_default.jpg'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Text(
-                  currentUser?.name ?? "Usuario",
+                  'Bienvenido, ${currentUser?.name ?? 'User'}',
                   style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
                     color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              'Historial de Accesos:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.blueAccent,
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'HIstorial de Accesos:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black87,
+                ),
               ),
             ),
           ),
-
           Expanded(
             child: FutureBuilder<List<UserAccessEntry>>(
               future: _accessHistoryFuture,
@@ -104,65 +99,98 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  print('ERROR FutureBuilder: ${snapshot.error}');
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: 40,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Error al cargar el historial: ${snapshot.error}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                        ElevatedButton(
-                          onPressed: _fetchAccessHistory,
-                          child: const Text('Reintentar'),
-                        ),
-                      ],
-                    ),
-                  );
+                  return const Center(child: Text('Error al cargar historial'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text('No hay registros de acceso disponibles.'),
-                  );
-                } else {
-                  final List<UserAccessEntry> accessHistory = snapshot.data!;
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: const <DataColumn>[
-                          DataColumn(label: Text('Ubicación')),
-                          DataColumn(label: Text('Fecha y Hora')),
-                          DataColumn(label: Text('Resultado')),
-                          DataColumn(label: Text('Confianza')),
+                  return const Center(child: Text('No hay registros.'));
+                }
+
+                final List<UserAccessEntry> accessHistory = snapshot.data!;
+                final List<Color> cardColors = [
+                  Colors.blueGrey.shade900,
+                  Colors.lightBlue.shade300,
+                  Colors.pinkAccent.shade200,
+                  Colors.cyan.shade400,
+                ];
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: accessHistory.length,
+                  itemBuilder: (context, index) {
+                    final access = accessHistory[index];
+                    final color = cardColors[index % cardColors.length];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(2, 4),
+                          )
                         ],
-                        rows:
-                            accessHistory.map<DataRow>((access) {
-                              return DataRow(
-                                cells: <DataCell>[
-                                  DataCell(Text(access.locationName ?? 'N/A')),
-                                  DataCell(Text(_formatDate(access.dateEntry))),
-                                  DataCell(Text(access.result ?? 'N/A')),
-                                  DataCell(
-                                    Text(
-                                      '${access.confidence?.toStringAsFixed(2) ?? 'N/A'}%',
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                bottomLeft: Radius.circular(16),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(16),
+                                  bottomRight: Radius.circular(16),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    access.locationName ?? 'Ubicación Desconocida',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Color(0xFF0B2849),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'Ubicacion Registrada',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    _formatDate(access.dateEntry),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: Colors.black54,
                                     ),
                                   ),
                                 ],
-                              );
-                            }).toList(),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    ),
-                  );
-                }
+                    );
+                  },
+                );
               },
             ),
           ),

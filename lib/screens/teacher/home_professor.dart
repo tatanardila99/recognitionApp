@@ -98,7 +98,7 @@ class _HomeProfessor extends State<HomeProfessor> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,12 +120,12 @@ class _HomeProfessor extends State<HomeProfessor> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(13),
                 gradient: const LinearGradient(
                   colors: [Color(0xFF86D3FF), Color(0xFF0075FF)],
                   begin: Alignment.topLeft,
@@ -154,13 +154,12 @@ class _HomeProfessor extends State<HomeProfessor> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
 
-                  Image.asset('assets/shield.jpg', height: 100),
+                  //Image.asset('assets/shield.jpg', height: 100),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 12),
 
             const Text(
               'Lista de Cursos',
@@ -170,7 +169,6 @@ class _HomeProfessor extends State<HomeProfessor> {
                 color: Colors.black,
               ),
             ),
-            const SizedBox(height: 20),
 
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -186,7 +184,7 @@ class _HomeProfessor extends State<HomeProfessor> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 1,
-                          crossAxisSpacing: 10,
+                          crossAxisSpacing: 0,
                           mainAxisSpacing: 10,
                           childAspectRatio: 3.0,
                         ),
@@ -212,7 +210,7 @@ class _HomeProfessor extends State<HomeProfessor> {
         ),
       ),
 
-      bottomNavigationBar: const BottomBarNavigationProfessor(),
+      bottomNavigationBar: BottomBarNavigationProfessor(),
     );
   }
 }
