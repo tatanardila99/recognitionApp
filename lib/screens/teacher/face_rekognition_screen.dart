@@ -51,27 +51,31 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
         widget.locationId.toString(),
       );
 
-      if (res != null) {
+      if (res?['access'] == 'granted') {
         Map<String, dynamic>? location = await _backendService.getLocationBYId(
           context,
           widget.locationId,
         );
         showSuccessDialog(
           context: context,
-          userName: res['username'],
-          confidence: res['similarity'],
+          userName: res?['username'],
+          confidence: res?['similarity'],
           locationName: location?['location_name'],
           onOkPressed: () => Navigator.pop(context),
         );
       } else {
         showToastMessage(
           context: context,
-          message: "El usuario no se encuentra registrado",
+          message: res?['message'],
           isError: true,
         );
       }
     } catch (e) {
-      print('Error al validar el acceso: $e');
+      showToastMessage(
+        context: context,
+        message: "Error inesperado",
+        isError: true,
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -165,3 +169,4 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
     );
   }
 }
+

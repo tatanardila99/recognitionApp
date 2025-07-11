@@ -10,14 +10,14 @@ class LocationDisplayCard extends StatelessWidget {
   final String startTime;
   final String endTime;
   final Location locationData;
-  final Function(Location location) onTap;
+  final Function(Location location) onCameraPressed;
   final Color cardColor;
 
   static final List<Color> _cardColors = [
-    Colors.blue.shade900!,
-    Colors.lightBlue.shade400!,
-    Colors.pinkAccent.shade100!,
-    Colors.cyan.shade400!,
+    Colors.blue.shade900,
+    Colors.lightBlue.shade400,
+    Colors.pinkAccent.shade100,
+    Colors.cyan.shade400,
   ];
 
   LocationDisplayCard({
@@ -28,7 +28,7 @@ class LocationDisplayCard extends StatelessWidget {
     required this.startTime,
     required this.endTime,
     required this.locationData,
-    required this.onTap,
+    required this.onCameraPressed,
     Color? cardColor,
   }) : cardColor = cardColor ?? _cardColors[Random().nextInt(_cardColors.length)];
 
@@ -66,74 +66,97 @@ class LocationDisplayCard extends StatelessWidget {
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () => onTap(locationData),
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-
-          padding: const EdgeInsets.fromLTRB(8.0, 12.0, 12.0, 12.0),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  width: 6,
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+      // La tarjeta ya no está envuelta en InkWell directamente
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8.0, 12.0, 12.0, 12.0),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: 6,
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(10),
                 ),
+              ),
+              const SizedBox(width: 15),
 
-                const SizedBox(width: 15),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        locationName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      locationName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        "Ubicacion Registrada",
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 13,
-                        ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      "Ubicacion Registrada",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 13,
                       ),
-                      const SizedBox(height: 1),
-                      Text(
-                        _formatTime(startTime),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      _formatTime(startTime),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 1),
-
-                      Text(
-                        'Edificio: $edificio, Salón: $salon',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      'Edificio: $edificio, Salón: $salon',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
                       ),
-                    ],
-                  ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 10),
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      onCameraPressed(locationData);
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(Icons.camera_alt, size: 24, color: Colors.blue),
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  InkWell(
+                    onTap: () {
+                      // onEditPressed(locationData);
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(Icons.edit, size: 24, color: Colors.orange),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

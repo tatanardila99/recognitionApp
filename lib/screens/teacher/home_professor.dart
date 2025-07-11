@@ -31,30 +31,7 @@ class _HomeProfessor extends State<HomeProfessor> {
       print("no esta llegando el id");
     }
   }
-  /*
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
 
-
-    final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-    if (args != null && !Provider.of<UserProvider>(context, listen: false).currentUserLoaded) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-      List<dynamic>? accessInfoRaw = args['accessInfo'];
-      Map<String, dynamic>? userDataRaw = args['userData'];
-
-      if (userDataRaw != null) {
-        userProvider.setUser(userDataRaw);
-      }
-      if (accessInfoRaw != null) {
-        userProvider.setAccessInfo(accessInfoRaw);
-      }
-      print('Datos guardados en el Provider.');
-    }
-  }*/
 
   Future<void> _fetchLocations() async {
     setState(() {
@@ -201,7 +178,7 @@ class _HomeProfessor extends State<HomeProfessor> {
                         startTime: location.horaEntrada,
                         endTime: location.horaSalida,
                         locationData: location,
-                        onTap: _onLocationCardTapped,
+                        onCameraPressed: _onLocationCardTapped,
                       );
                     },
                   ),

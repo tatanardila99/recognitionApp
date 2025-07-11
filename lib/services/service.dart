@@ -102,9 +102,12 @@ class BackendService {
         final Map<String, dynamic> data = json.decode(responseBody);
         String? userName = data['user'];
         double? similarity = data['similarity'];
-        return {'username': userName, 'similarity': similarity};
+        return {'access': 'granted', 'username': userName, 'similarity': similarity};
       } else if (response.statusCode == 203) {
-        return {'username': 'Desconocido', 'similarity': '0.0'};
+        final responseBody = await response.stream.bytesToString();
+        final Map<String, dynamic> data = json.decode(responseBody);
+        String? detail = data['detalle'];
+        return {'access:': 'denied', 'message': detail};
       } else {
         final responseBody = await response.stream.bytesToString();
         return null;

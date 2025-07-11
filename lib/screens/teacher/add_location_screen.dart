@@ -15,30 +15,40 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   final BackendService _backendService = BackendService();
 
   final _locationNameController = TextEditingController();
-  final _salonController = TextEditingController();
+  final _roomController = TextEditingController();
 
-  String? _selectedEdificio;
-  TimeOfDay? _selectedHoraEntrada;
-  TimeOfDay? _selectedHoraSalida;
+  int? _selectedDay;
+  String? _selectedBuilding;
+  TimeOfDay? _selectedEntryTime;
+  TimeOfDay? _selectedDepartureTime;
 
-  final Map<String, String> _edificioOptions = {
+  final Map<String, String> _buildingOptions = {
     'A': 'Edificio A',
     'B': 'Edificio B',
     'C': 'Edificio C',
     'D': 'Edificio D',
   };
 
+  final Map<int, String> _dayOptions = {
+    1: 'Lunes',
+    2: 'Martes',
+    3: 'Miércoles',
+    4: 'Jueves',
+    5: 'Viernes',
+    6: 'Sabado',
+  };
+
   @override
   void dispose() {
     _locationNameController.dispose();
-    _salonController.dispose();
+    _roomController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectTime(BuildContext context, {required bool isEntrada}) async {
+  Future<void> _selectTime(BuildContext context, {required bool isEntry}) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: isEntrada ? (_selectedHoraEntrada ?? TimeOfDay.now()) : (_selectedHoraSalida ?? TimeOfDay.now()),
+      initialTime: isEntry ? (_selectedEntryTime ?? TimeOfDay.now()) : (_selectedDepartureTime ?? TimeOfDay.now()),
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -48,10 +58,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (isEntrada) {
-          _selectedHoraEntrada = picked;
+        if (isEntry) {
+          _selectedEntryTime = picked;
         } else {
-          _selectedHoraSalida = picked;
+        _selectedDepartureTime = picked;
         }
       });
     }
@@ -63,12 +73,13 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
     if (_formKey.currentState!.validate()) {
       final locationName = _locationNameController.text;
-      final edificio = _selectedEdificio;
-      final salon = int.tryParse(_salonController.text);
-      final horaEntrada = _selectedHoraEntrada;
-      final horaSalida = _selectedHoraSalida;
+      final building = _selectedBuilding;
+      final room = int.tryParse(_roomController.text);
+      final day = _selectedDay;
+      final entryTime = _selectedEntryTime;
+      final departureTime = _selectedDepartureTime;
 
-      if (edificio == null || horaEntrada == null || horaSalida == null || salon == null) {
+      if (building == null || entryTime== null || departureTime == null || room == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Por favor completa todos los campos correctamente.')),
         );
@@ -77,10 +88,11 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
 
       bool res = await _backendService.addLocation(context, {
         'name': locationName,
-        'edificio': edificio,
-        'salon': salon,
-        'hora_entrada': '${horaEntrada.hour.toString().padLeft(2, '0')}:${horaEntrada.minute.toString().padLeft(2, '0')}:00',
-        'hora_salida': '${horaSalida.hour.toString().padLeft(2, '0')}:${horaSalida.minute.toString().padLeft(2, '0')}:00',
+        'edificio': building,
+        'salon': room,
+        'day': day,
+        'hora_entrada': '${entryTime.hour.toString().padLeft(2, '0')}:${entryTime.minute.toString().padLeft(2, '0')}:00',
+        'hora_salida': '${departureTime.hour.toString().padLeft(2, '0')}:${departureTime.minute.toString().padLeft(2, '0')}:00',
         'responsible_id': responsibleId,
       });
 
@@ -134,21 +146,21 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: _selectedEdificio,
+                value: _selectedBuilding,
                 decoration: _inputDecoration('Edificio', Icons.business),
                 hint: const Text('Selecciona un edificio'),
-                items: _edificioOptions.entries.map((entry) {
+                items: _buildingOptions.entries.map((entry) {
                   return DropdownMenuItem<String>(
                     value: entry.key,
                     child: Text(entry.value),
                   );
                 }).toList(),
-                onChanged: (value) => setState(() => _selectedEdificio = value),
+                onChanged: (value) => setState(() => _selectedBuilding = value),
                 validator: (value) => value == null ? 'Este campo es obligatorio' : null,
               ),
               const SizedBox(height: 20),
               TextFormField(
-                controller: _salonController,
+                controller: _roomController,
                 keyboardType: TextInputType.number,
                 decoration: _inputDecoration('Salón', Icons.meeting_room, 'Ej: 101, 205'),
                 validator: (value) {
@@ -158,35 +170,49 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 },
               ),
               const SizedBox(height: 20),
+              DropdownButtonFormField<int>(
+                value: _selectedDay,
+                decoration: _inputDecoration('Dia', Icons.calendar_month),
+                hint: const Text('Selecciona un dia'),
+                items: _dayOptions.entries.map((entry) {
+                  return DropdownMenuItem<int>(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedDay = value),
+                validator: (value) => value == null ? 'Este campo es obligatorio' : null,
+              ),
+              const SizedBox(height: 20),
               GestureDetector(
-                onTap: () => _selectTime(context, isEntrada: true),
+                onTap: () => _selectTime(context, isEntry: true),
                 child: AbsorbPointer(
                   child: TextFormField(
                     readOnly: true,
                     controller: TextEditingController(
-                      text: _selectedHoraEntrada?.format(context) ?? '',
+                      text: _selectedEntryTime?.format(context) ?? '',
                     ),
                     decoration: _inputDecoration('Hora de Entrada', Icons.access_time),
-                    validator: (_) => _selectedHoraEntrada == null ? 'Este campo es obligatorio' : null,
+                    validator: (_) => _selectedEntryTime == null ? 'Este campo es obligatorio' : null,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () => _selectTime(context, isEntrada: false),
+                onTap: () => _selectTime(context, isEntry: false),
                 child: AbsorbPointer(
                   child: TextFormField(
                     readOnly: true,
                     controller: TextEditingController(
-                      text: _selectedHoraSalida?.format(context) ?? '',
+                      text: _selectedDepartureTime?.format(context) ?? '',
                     ),
                     decoration: _inputDecoration('Hora de Salida', Icons.access_time),
                     validator: (_) {
-                      if (_selectedHoraSalida == null) return 'Este campo es obligatorio';
-                      if (_selectedHoraEntrada != null && _selectedHoraSalida != null) {
-                        final entradaMinutes = _selectedHoraEntrada!.hour * 60 + _selectedHoraEntrada!.minute;
-                        final salidaMinutes = _selectedHoraSalida!.hour * 60 + _selectedHoraSalida!.minute;
-                        if (salidaMinutes <= entradaMinutes) {
+                      if (_selectedDepartureTime == null) return 'Este campo es obligatorio';
+                      if (_selectedEntryTime != null && _selectedDepartureTime != null) {
+                        final entryMinutes = _selectedEntryTime!.hour * 60 + _selectedEntryTime!.minute;
+                        final departureMinutes = _selectedDepartureTime!.hour * 60 + _selectedDepartureTime!.minute;
+                        if (departureMinutes <= entryMinutes) {
                           return 'Debe ser posterior a la hora de entrada';
                         }
                       }
