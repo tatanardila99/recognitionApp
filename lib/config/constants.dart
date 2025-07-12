@@ -1,5 +1,5 @@
 
-const String kBaseUrl = 'http://192.168.1.6:3000/api';
+const String kBaseUrl = 'https://faceauth-server.onrender.com/api';
 
 
 const String kAppName = 'UTS Recognition App';
