@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uts_recognitionapp/providers/user_provider.dart';
 import 'package:uts_recognitionapp/services/auth_service.dart';
 
-import '../services/service.dart';
+import '../services/service.dart'; // Asegúrate de que este import sea correcto
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,6 +25,13 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: isError ? Colors.red : Colors.green,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -108,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: 'Ingrese el correo',
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20.0,
                           vertical: 20.0,
                         ),
@@ -126,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         hintText: 'Ingrese la clave',
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20.0,
                           vertical: 20.0,
                         ),
@@ -155,7 +162,9 @@ class _LoginPageState extends State<LoginPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Lógica para "Olvido la clave"
+                        },
                         child: const Text(
                           'Olvido la clave',
                           style: TextStyle(
@@ -168,73 +177,82 @@ class _LoginPageState extends State<LoginPage> {
                     Column(
                       children: [
                         ElevatedButton(
-                          onPressed:
-                              _isLoading
-                                  ? null
-                                  : () async {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    String email = _emailController.text;
-                                    String password = _passwordController.text;
+                          onPressed: _isLoading
+                              ? null
+                              : () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            String email = _emailController.text;
+                            String password = _passwordController.text;
 
-                                    try {
-                                      final Map<String, dynamic> result =
-                                          await AuthService().login(
-                                            context,
-                                            email,
-                                            password,
-                                          );
+                            try {
+                              final Map<String, dynamic> result =
+                              await AuthService().login(
+                                context,
+                                email,
+                                password,
+                              );
 
-                                      if (result['success'] == true) {
-                                        _showMessage(result['message']);
+                              if (result['success'] == true) {
+                                _showMessage(result['message']);
 
-                                        //AuthService().setAuthToken(token);
-
-                                        final userProvider =
-                                            Provider.of<UserProvider>(
-                                              context,
-                                              listen: false,
-                                            );
-                                        final String? userRole =
-                                            userProvider.currentUser?.rol;
-                                        print('rol ==> $userRole');
-                                        switch (userRole) {
-                                          case 'estudiante':
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              '/student/home',
-                                            );
-                                          case 'profesor':
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              '/professor/home',
-                                            );
-                                          case 'admin':
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              '/admin/home',
-                                            );
-                                        }
-                                      } else {
-                                        _showMessage(
-                                          result['message'],
-                                          isError: true,
-                                        );
-                                      }
-                                    } catch (e) {
-                                      _showMessage(
-                                        "Error de conexion o servidor: $e",
-                                      );
-                                    } finally {
-                                      setState(() {
-                                        _isLoading = false;
-                                      });
-                                    }
-                                  },
+                                if (!mounted) return;
+                                final userProvider =
+                                Provider.of<UserProvider>(
+                                  context,
+                                  listen: false,
+                                );
+                                final String? userRole =
+                                    userProvider.currentUser?.rol;
+                                print('rol ==> $userRole');
+                                switch (userRole) {
+                                  case 'estudiante':
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/student/home',
+                                    );
+                                    break;
+                                  case 'profesor':
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/professor/home',
+                                    );
+                                    break;
+                                  case 'admin':
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/admin/home',
+                                    );
+                                    break;
+                                  default:
+                                    _showMessage(
+                                      'Rol de usuario desconocido o no asignado.',
+                                      isError: true,
+                                    );
+                                    break;
+                                }
+                              } else {
+                                _showMessage(
+                                  result['message'],
+                                  isError: true,
+                                );
+                              }
+                            } catch (e) {
+                              _showMessage(
+                                "Error de conexión o servidor: $e",
+                                isError: true,
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF899DD9),
-
+                            backgroundColor: const Color(0xFF899DD9),
                             padding: const EdgeInsets.symmetric(
                               vertical: 11.0,
                               horizontal: 80.0,
@@ -279,6 +297,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
+            if (_isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

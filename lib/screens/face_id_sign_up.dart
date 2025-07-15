@@ -30,13 +30,18 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   final _documentController = TextEditingController();
   final BackendService _backendService = BackendService();
 
+  bool _isLoading = false;
+
   String? _selectedRol;
   final List<String> _roles = ['estudiante', 'profesor'];
 
   File? _capturedFace;
   FaceCameraController? _cameraController;
   bool _isCameraActive = false;
-  String _cameraMessage = 'Tomar foto';
+  String _cameraMessage = 'Toca para tomar una foto'; // Initial message
+
+
+  BuildContext? _activeCameraDialogContext;
 
   @override
   void initState() {
@@ -44,34 +49,19 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
     _cameraController = FaceCameraController(
       autoCapture: true,
       defaultCameraLens: CameraLens.front,
+      ignoreFacePositioning: false,
       onCapture: (File? image) async {
-        if (image != null) {
-          _cameraController?.stopImageStream();
+        _cameraController?.stopImageStream();
 
-          final confirm = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(builder: (_) => ReviewPhotoPage(image: image)),
-          );
 
-          if (confirm == true) {
-            setState(() {
-              _capturedFace = image;
-              _isCameraActive = false;
-              _cameraMessage = 'Rostro capturado: ${path.basename(_capturedFace!.path)}';
-            });
-          } else {
-            setState(() {
-              _capturedFace = null;
-              _isCameraActive = false;
-              _cameraMessage = 'Toca para tomar una foto';
-            });
-          }
-        } else {
-          setState(() {
-            _isCameraActive = false;
-            _cameraMessage = 'Error al capturar rostro. Toca para reintentar.';
-          });
+        if (image != null && _activeCameraDialogContext != null) {
+          Navigator.of(_activeCameraDialogContext!).pop(image);
+          _activeCameraDialogContext = null;
+        } else if (_activeCameraDialogContext != null) {
+          Navigator.of(_activeCameraDialogContext!).pop(null);
+          _activeCameraDialogContext = null;
         }
+
       },
       onFaceDetected: (Face? face) {
         if (_isCameraActive) {
@@ -86,6 +76,10 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   @override
   void dispose() {
     _cameraController?.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _documentController.dispose();
     super.dispose();
   }
 
@@ -101,10 +95,11 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
   }
 
   void _showCameraDialog() {
-    showDialog(
+    showDialog<File?>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext ctx) {
+        _activeCameraDialogContext = ctx;
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.all(16),
@@ -133,7 +128,11 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                     icon: const Icon(Icons.close, color: Colors.redAccent),
                     onPressed: () {
                       _cameraController?.stopImageStream();
-                      Navigator.of(ctx).pop();
+
+                      if (_activeCameraDialogContext != null) {
+                        Navigator.of(_activeCameraDialogContext!).pop(null);
+                        _activeCameraDialogContext = null;
+                      }
                     },
                   ),
                 ),
@@ -142,6 +141,52 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
           ),
         );
       },
+    ).then((File? capturedImageFromDialog) async {
+
+      _activeCameraDialogContext = null;
+
+      if (capturedImageFromDialog != null) {
+
+        final confirm = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(builder: (_) => ReviewPhotoPage(image: capturedImageFromDialog)),
+        );
+
+        if (mounted) {
+          if (confirm == true) {
+            setState(() {
+              _capturedFace = capturedImageFromDialog;
+              _isCameraActive = false;
+              _cameraMessage = 'Rostro capturado: ${path.basename(_capturedFace!.path)}';
+            });
+          } else {
+
+            setState(() {
+              _capturedFace = null;
+              _isCameraActive = false;
+              _cameraMessage = 'Toca para tomar una foto';
+            });
+
+          }
+        }
+      } else {
+
+        setState(() {
+          _capturedFace = null;
+          _isCameraActive = false;
+          _cameraMessage = 'Toca para tomar una foto';
+        });
+      }
+    });
+  }
+
+
+  void showToastMessage({required BuildContext context, required String message, bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
     );
   }
 
@@ -307,7 +352,12 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                         ),
                         onPressed: () async {
+                          // Solo establecer _isLoading en true si la validación pasa y se ha capturado una cara
                           if (_formKey.currentState!.validate() && _capturedFace != null) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+
                             final String name = _nameController.text;
                             final String email = _emailController.text;
                             final String password = _passwordController.text;
@@ -317,11 +367,32 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                               name, email, password, document, _selectedRol!, _capturedFace,
                             );
 
-                            if (success) {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-                            } else {
-                              // mostrar error si es necesario
+                            if (mounted) { // Verificar 'mounted' antes de actualizar el estado o navegar
+                              if (success) {
+                                // Mostrar mensaje de éxito
+                                showToastMessage(context: context, message: 'Registro exitoso!');
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                              } else {
+                                showToastMessage(
+                                  context: context,
+                                  message: 'Error al intentar registrarse. Intenta nuevamente.',
+                                  isError: true,
+                                );
+                              }
+                              setState(() {
+                                _isLoading = false; // Detener la carga independientemente del éxito/fallo
+                              });
                             }
+                          } else {
+                            // Si el formulario no es válido o la cara no ha sido capturada, mostrar un mensaje
+                            if (_capturedFace == null) {
+                              showToastMessage(
+                                context: context,
+                                message: 'Por favor, captura una foto de tu rostro.',
+                                isError: true,
+                              );
+                            }
+                            // La validación del formulario mostrará errores específicos para los campos de texto
                           }
                         },
                         child: const Text(
@@ -349,6 +420,15 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
               ),
             ),
           ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
     );

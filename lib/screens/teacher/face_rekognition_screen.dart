@@ -73,7 +73,7 @@ class _FaceCameraScreenState extends State<FaceCameraScreen> {
     } catch (e) {
       showToastMessage(
         context: context,
-        message: "Error inesperado",
+        message: "Error en el servidor",
         isError: true,
       );
     } finally {

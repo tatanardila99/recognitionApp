@@ -109,11 +109,15 @@ class BackendService {
         String? detail = data['detalle'];
         return {'access:': 'denied', 'message': detail};
       } else {
+        print("in else error = ${response.statusCode}");
         final responseBody = await response.stream.bytesToString();
-        return null;
+        final Map<String, dynamic> data = json.decode(responseBody);
+        String? detail = data['detalle'];
+        return {'access:': 'denied', 'message': detail};
       }
     } catch (e) {
-      return null;
+      print("in catch error = ${e}");
+      return {'access:': 'denied', 'message': e.toString()};;
     }
   }
 
