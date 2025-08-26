@@ -8,6 +8,7 @@ const int kDefaultTimeoutSeconds = 30;
 
 class ApiEndpoints {
   static const String login = '$kBaseUrl/sign-in';
+  static const String register = '$kBaseUrl/register';
   static const String locationById = '$kBaseUrl/get-location-by-id';
   static const String locations = '$kBaseUrl/all-locations';
   static const String validateFace = '$kBaseUrl/validate-access';

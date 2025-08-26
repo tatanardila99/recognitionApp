@@ -35,17 +35,17 @@ class BackendService {
   void _handleUnauthorized(BuildContext context) {
     AuthService().logout(context);
   }
-  
 
-  Future<bool> sendDataRegister(
-    String name,
-    String email,
-    String password,
-    String document,
-    String rol,
-    File? face,
-  ) async {
-    final Uri uri = Uri.parse('$kBaseUrl/register');
+
+  Future<Map<String, dynamic>> sendDataRegister(
+      String name,
+      String email,
+      String password,
+      String document,
+      String rol,
+      File? face,
+      ) async {
+    final Uri uri = Uri.parse(ApiEndpoints.register);
 
     try {
       final request = http.MultipartRequest('POST', uri);
@@ -69,15 +69,44 @@ class BackendService {
       }
 
       final response = await request.send();
+      final responseBodyString = await response.stream.bytesToString();
 
-      if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
-        return true;
+      Map<String, dynamic>? parsedResponse;
+      try {
+        if (responseBodyString.isNotEmpty) {
+          parsedResponse = json.decode(responseBodyString);
+        }
+      } catch (e) {
+        print('Respuesta no es JSON o JSON inválido: $e. Raw response: $responseBodyString');
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': parsedResponse?['message'],
+          'data': parsedResponse,
+        };
+      } else if (response.statusCode == 409) {
+        return {
+          'success': false,
+          'message': parsedResponse?['message'],
+        };
+      } else if (response.statusCode == 400) {
+        return {
+          'success': false,
+          'message': 'Error al registrar el usuario',
+        };
       } else {
-        return false;
+        return {
+          'success': false,
+          'message': 'Error inesperado',
+        };
       }
     } catch (error) {
-      return false;
+      return {
+        'success': false,
+        'message': 'Error de conexión o en el servidor',
+      };
     }
   }
 

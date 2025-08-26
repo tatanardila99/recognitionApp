@@ -7,6 +7,7 @@ class LocationDisplayCard extends StatelessWidget {
   final String locationName;
   final String edificio;
   final int salon;
+  final int? day;
   final String startTime;
   final String endTime;
   final Location locationData;
@@ -25,6 +26,7 @@ class LocationDisplayCard extends StatelessWidget {
     required this.locationName,
     required this.edificio,
     required this.salon,
+    this.day,
     required this.startTime,
     required this.endTime,
     required this.locationData,
@@ -32,7 +34,7 @@ class LocationDisplayCard extends StatelessWidget {
     Color? cardColor,
   }) : cardColor = cardColor ?? _cardColors[Random().nextInt(_cardColors.length)];
 
-  String _formatTime(String dateString) {
+  String _formatTime(String dateString, int dayInt) {
     try {
       final dateTime = DateTime.parse(dateString);
       return DateFormat('HH:mm EEEE, dd MMMM yyyy', 'es_ES').format(dateTime);
@@ -42,7 +44,7 @@ class LocationDisplayCard extends StatelessWidget {
         final now = DateTime.now();
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
-        final dateTimeWithCurrentDate = DateTime(now.year, now.month, now.day, hour, minute);
+        final dateTimeWithCurrentDate = DateTime(now.year, now.month, dayInt - 1, hour, minute);
         return DateFormat('HH:mm EEEE, d MMMM', 'es_ES').format(dateTimeWithCurrentDate);
       }
       return "Fecha inválida";
@@ -106,7 +108,7 @@ class LocationDisplayCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 1),
                     Text(
-                      _formatTime(startTime),
+                      _formatTime(startTime, day as int),
                       style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
@@ -141,17 +143,6 @@ class LocationDisplayCard extends StatelessWidget {
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Icon(Icons.camera_alt, size: 24, color: Colors.blue),
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  InkWell(
-                    onTap: () {
-                      // onEditPressed(locationData);
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(Icons.edit, size: 24, color: Colors.orange),
                     ),
                   ),
                 ],

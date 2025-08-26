@@ -175,6 +175,7 @@ class _HomeProfessor extends State<HomeProfessor> {
                         locationName: location.name,
                         edificio: location.edificio,
                         salon: location.salon,
+                        day: location.day,
                         startTime: location.horaEntrada,
                         endTime: location.horaSalida,
                         locationData: location,

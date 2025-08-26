@@ -352,7 +352,6 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                         ),
                         onPressed: () async {
-                          // Solo establecer _isLoading en true si la validación pasa y se ha capturado una cara
                           if (_formKey.currentState!.validate() && _capturedFace != null) {
                             setState(() {
                               _isLoading = true;
@@ -363,19 +362,18 @@ class _MyFormState extends State<MyForm> with WidgetsBindingObserver {
                             final String password = _passwordController.text;
                             final String document = _documentController.text;
 
-                            bool success = await _backendService.sendDataRegister(
+                            Map<String, dynamic> res = await _backendService.sendDataRegister(
                               name, email, password, document, _selectedRol!, _capturedFace,
                             );
 
-                            if (mounted) { // Verificar 'mounted' antes de actualizar el estado o navegar
-                              if (success) {
-                                // Mostrar mensaje de éxito
-                                showToastMessage(context: context, message: 'Registro exitoso!');
+                            if (mounted) {
+                              if (res['success']) {
+                                showToastMessage(context: context, message: res['message']);
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
                               } else {
                                 showToastMessage(
                                   context: context,
-                                  message: 'Error al intentar registrarse. Intenta nuevamente.',
+                                  message: res['message'],
                                   isError: true,
                                 );
                               }
